@@ -67,7 +67,7 @@ class ScannerBottomNavBar extends StatelessWidget {
             Expanded(
               child: Center(
                 child: _ScanFab(
-                  onTap: () => controller.processQRData('user_uuid_987654321'),
+                  onTap: () => controller.openCheckIn('user_uuid_987654321'),
                   color: _green,
                   glowColor: _greenGlow,
                 ),
