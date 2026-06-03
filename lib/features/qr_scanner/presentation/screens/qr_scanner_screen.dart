@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../controllers/qr_scanner_controller.dart';
+import '../../controllers/qr_scanner_controller.dart';  
 import '../widgets/scanner_viewport_overlay.dart';
 
 class QrScannerScreen extends GetView<QrScannerController> {
