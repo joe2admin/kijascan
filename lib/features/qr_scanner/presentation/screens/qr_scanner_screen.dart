@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:kijascan/core/navigation/tab_navigation.dart';
-import 'package:kijascan/features/bottom_nav_bar.dart/presentation/screens/bottom_nav_bar_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../controllers/qr_scanner_controller.dart';
 import '../widgets/scanner_viewport_overlay.dart';
@@ -27,13 +24,11 @@ class QrScannerScreen extends GetView<QrScannerController> {
     final screenSize = MediaQuery.sizeOf(context);
     final scanWindow = _scanWindow(screenSize);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
+    return ColoredBox(
+      color: Colors.black,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
             MobileScanner(
               controller: controller.cameraController,
               fit: BoxFit.cover,
@@ -72,6 +67,7 @@ class QrScannerScreen extends GetView<QrScannerController> {
               );
             }),
             SafeArea(
+              bottom: false,
               child: Column(
                 children: [
                   _TopBar(
@@ -79,20 +75,14 @@ class QrScannerScreen extends GetView<QrScannerController> {
                     isTorchOn: controller.isTorchOn,
                   ),
                   const Spacer(),
-                  const _ScanHint(),
-                  const SizedBox(height: 16),
                   const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-                    child: ScannerBottomNavBar(
-                      selectedIndex: 1,
-                      onTabChanged: onMainTabChanged,
-                    ),
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: _ScanHint(),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

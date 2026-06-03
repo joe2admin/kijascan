@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/features/main_shell/controllers/main_shell_controller.dart';
 import 'package:kijascan/features/qr_scanner/controllers/qr_scanner_controller.dart';
 import 'package:kijascan/routes/app_routes.dart';
 
@@ -10,7 +11,10 @@ class CheckInSuccessScreen extends StatelessWidget {
   static const Color _darkBg = Color(0xFF0A120D);
 
   static void _returnToScanner() {
-    Get.until((route) => route.settings.name == AppRoutes.qrScanner);
+    Get.until((route) => route.settings.name == AppRoutes.main);
+    if (Get.isRegistered<MainShellController>()) {
+      Get.find<MainShellController>().goToScanTab();
+    }
     if (Get.isRegistered<QrScannerController>()) {
       Get.find<QrScannerController>().resetScanner();
     }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/attendance_record.dart';
 
@@ -5,10 +6,11 @@ enum HistoryFilter { all, today, week }
 
 class HistoryController extends GetxController {
   final isLoading = true.obs;
-  final selectedFilter = HistoryFilter.all.obs;
+  final selectedFilter = HistoryFilter.today.obs;
   final groups = <HistoryDayGroup>[].obs;
   final todayCount = 0.obs;
   final weekCount = 0.obs;
+  final isCheckingOut = false.obs;
 
   List<HistoryDayGroup> _allGroups = [];
 
@@ -30,6 +32,24 @@ class HistoryController extends GetxController {
   void setFilter(HistoryFilter filter) {
     selectedFilter.value = filter;
     _applyFilter();
+  }
+
+  Future<void> submitCheckOut(AttendanceRecord record) async {
+    if (isCheckingOut.value) return;
+
+    isCheckingOut.value = true;
+    await Future.delayed(const Duration(seconds: 1));
+    isCheckingOut.value = false;
+
+    Get.back();
+
+    Get.snackbar(
+      'Checked out',
+      '${record.employeeName} has been checked out.',
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 2),
+    );
   }
 
   void _applyFilter() {
@@ -103,6 +123,7 @@ class HistoryController extends GetxController {
             employeeName: 'Amina Okello',
             employeeId: 'EMP-1042',
             role: 'Field Officer',
+            department: 'Operations',
             checkedInAt: today.add(const Duration(hours: 8, minutes: 12)),
           ),
           AttendanceRecord(
@@ -110,6 +131,7 @@ class HistoryController extends GetxController {
             employeeName: 'James Mwangi',
             employeeId: 'EMP-2048',
             role: 'Supervisor',
+            department: 'Logistics',
             checkedInAt: today.add(const Duration(hours: 9, minutes: 5)),
           ),
           AttendanceRecord(
@@ -117,6 +139,7 @@ class HistoryController extends GetxController {
             employeeName: 'Sarah Njoroge',
             employeeId: 'EMP-3011',
             role: 'Analyst',
+            department: 'Finance',
             checkedInAt: today.add(const Duration(hours: 10, minutes: 42)),
           ),
         ],
@@ -130,6 +153,7 @@ class HistoryController extends GetxController {
             employeeName: 'David Kimani',
             employeeId: 'EMP-1180',
             role: 'Technician',
+            department: 'Maintenance',
             checkedInAt: yesterday.add(const Duration(hours: 7, minutes: 55)),
           ),
           AttendanceRecord(
@@ -137,6 +161,7 @@ class HistoryController extends GetxController {
             employeeName: 'Grace Wanjiku',
             employeeId: 'EMP-2205',
             role: 'Coordinator',
+            department: 'HR',
             checkedInAt: yesterday.add(const Duration(hours: 14, minutes: 20)),
           ),
         ],
@@ -150,6 +175,7 @@ class HistoryController extends GetxController {
             employeeName: 'Peter Ochieng',
             employeeId: 'EMP-1099',
             role: 'Driver',
+            department: 'Transport',
             checkedInAt: today.subtract(const Duration(days: 3, hours: -8)),
           ),
         ],

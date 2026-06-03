@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:kijascan/core/navigation/tab_navigation.dart';
-import 'package:kijascan/features/bottom_nav_bar.dart/presentation/screens/bottom_nav_bar_screen.dart';
 import 'package:kijascan/features/history/controllers/history_controller.dart';
 import 'package:kijascan/features/history/models/attendance_record.dart';
+import 'package:kijascan/features/history/presentation/widgets/employee_details_modal.dart';
 
 class HistoryScreen extends GetView<HistoryController> {
   const HistoryScreen({super.key});
 
   static const Color _green = Color(0xFF22C55E);
-  static const Color _bg = Color(0xFFF3F4F6);
+  static const Color backgroundColor = Color(0xFFF3F4F6);
+  static const Color _bg = backgroundColor;
   static const Color _textDark = Color(0xFF1F2937);
   static const Color _muted = Color(0xFF9CA3AF);
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        backgroundColor: _bg,
-        body: SafeArea(
-          child: Column(
+    return ColoredBox(
+      color: _bg,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Padding(
@@ -64,7 +62,7 @@ class HistoryScreen extends GetView<HistoryController> {
                     onRefresh: controller.loadHistory,
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
                       itemCount: controller.groups.length,
                       itemBuilder: (context, index) {
                         final group = controller.groups[index];
@@ -75,14 +73,6 @@ class HistoryScreen extends GetView<HistoryController> {
                 }),
               ),
             ],
-          ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          child: ScannerBottomNavBar(
-            selectedIndex: 0,
-            onTabChanged: onMainTabChanged,
-          ),
         ),
       ),
     );
@@ -351,7 +341,10 @@ class _HistoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final initials = _initials(record.employeeName);
 
-    return Container(
+    return GestureDetector(
+      onTap: () => EmployeeDetailsModal.show(record),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -401,7 +394,7 @@ class _HistoryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${record.employeeId} · ${record.role}',
+                  '${record.employeeId} · ${record.departmentLabel}',
                   style: const TextStyle(
                     color: HistoryScreen._muted,
                     fontSize: 12,
@@ -455,15 +448,19 @@ class _HistoryTile extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
   String _initials(String name) {
     final parts =
-        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
     if (parts.isEmpty) return '?';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return '${parts.first[0]}${parts.elementAt(1)[0]}'.toUpperCase();
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return '${parts[0].substring(0, 1)}${parts[1].substring(0, 1)}'
+        .toUpperCase();
   }
 }
 

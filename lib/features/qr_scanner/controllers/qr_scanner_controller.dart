@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/features/main_shell/controllers/main_shell_controller.dart';
 import 'package:kijascan/routes/app_routes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
@@ -26,13 +27,30 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
   @override
   void onReady() {
     super.onReady();
-    initializeCamera();
+    if (_isScanTabActive) {
+      initializeCamera();
+    }
+  }
+
+  bool get _isScanTabActive {
+    if (!Get.isRegistered<MainShellController>()) return true;
+    return Get.find<MainShellController>().currentIndex.value == 1;
+  }
+
+  Future<void> pauseCamera() => cameraController.stop();
+
+  Future<void> resumeCamera() async {
+    if (_isScanTabActive && isScanning.value) {
+      await initializeCamera();
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (Get.currentRoute == AppRoutes.qrScanner && isScanning.value) {
+      if (Get.currentRoute == AppRoutes.main &&
+          _isScanTabActive &&
+          isScanning.value) {
         initializeCamera();
       }
     } else if (state == AppLifecycleState.paused) {
@@ -128,6 +146,8 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
 
   Future<void> resetScanner() async {
     isScanning.value = true;
-    await initializeCamera();
+    if (_isScanTabActive) {
+      await initializeCamera();
+    }
   }
 }

@@ -43,7 +43,7 @@ class ScannerBottomNavBar extends StatelessWidget {
               icon: Icons.qr_code_scanner_rounded,
               label: 'Scan',
               isActive: selectedIndex == 1,
-              onTap: () {},
+              onTap: () => onTabChanged(1),
             ),
           ),
           Expanded(

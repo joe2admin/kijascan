@@ -145,7 +145,7 @@ class CheckInController extends GetxController {
 
     Get.offNamedUntil(
       AppRoutes.checkInSuccess,
-      (route) => route.settings.name == AppRoutes.qrScanner,
+      (route) => route.settings.name == AppRoutes.main,
       arguments: {
         'message': statusMessage.value,
         'employeeName': name,

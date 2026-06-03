@@ -8,6 +8,7 @@ class EmployeeTicketCard extends StatelessWidget {
   final Color valueColor;
   final String headerDate;
   final String employeeId;
+  final String department;
   final String positionRole;
   final String checkedInTime;
   final String date;
@@ -20,6 +21,7 @@ class EmployeeTicketCard extends StatelessWidget {
     required this.valueColor,
     required this.headerDate,
     required this.employeeId,
+    required this.department,
     required this.positionRole,
     required this.checkedInTime,
     required this.date,
@@ -66,6 +68,7 @@ class EmployeeTicketCard extends StatelessWidget {
                   labelColor: labelColor,
                   valueColor: valueColor,
                   employeeId: employeeId,
+                  department: department,
                   positionRole: positionRole,
                   checkedInTime: checkedInTime,
                   date: date,
@@ -140,6 +143,7 @@ class _DetailsGrid extends StatelessWidget {
   final Color labelColor;
   final Color valueColor;
   final String employeeId;
+  final String department;
   final String positionRole;
   final String checkedInTime;
   final String date;
@@ -148,6 +152,7 @@ class _DetailsGrid extends StatelessWidget {
     required this.labelColor,
     required this.valueColor,
     required this.employeeId,
+    required this.department,
     required this.positionRole,
     required this.checkedInTime,
     required this.date,
@@ -171,8 +176,8 @@ class _DetailsGrid extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _DetailCell(
-                label: 'Position / Role',
-                value: positionRole,
+                label: 'Department',
+                value: department,
                 labelColor: labelColor,
                 valueColor: valueColor,
               ),
@@ -185,8 +190,8 @@ class _DetailsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _DetailCell(
-                label: 'Checked-in Time',
-                value: checkedInTime,
+                label: 'Position / Role',
+                value: positionRole,
                 labelColor: labelColor,
                 valueColor: valueColor,
               ),
@@ -194,13 +199,20 @@ class _DetailsGrid extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _DetailCell(
-                label: 'Date',
-                value: date,
+                label: 'Checked-in Time',
+                value: checkedInTime,
                 labelColor: labelColor,
                 valueColor: valueColor,
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 22),
+        _DetailCell(
+          label: 'Date',
+          value: date,
+          labelColor: labelColor,
+          valueColor: valueColor,
         ),
       ],
     );
