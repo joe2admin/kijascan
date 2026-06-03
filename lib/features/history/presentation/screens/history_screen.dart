@@ -1,0 +1,509 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:kijascan/core/navigation/tab_navigation.dart';
+import 'package:kijascan/features/bottom_nav_bar.dart/presentation/screens/bottom_nav_bar_screen.dart';
+import 'package:kijascan/features/history/controllers/history_controller.dart';
+import 'package:kijascan/features/history/models/attendance_record.dart';
+
+class HistoryScreen extends GetView<HistoryController> {
+  const HistoryScreen({super.key});
+
+  static const Color _green = Color(0xFF22C55E);
+  static const Color _bg = Color(0xFFF3F4F6);
+  static const Color _textDark = Color(0xFF1F2937);
+  static const Color _muted = Color(0xFF9CA3AF);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: _bg,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
+                child: _HistoryHeader(),
+              ),
+              const SizedBox(height: 20),
+              Obx(() => _StatsRow(
+                    todayCount: controller.todayCount.value,
+                    weekCount: controller.weekCount.value,
+                  )),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Obx(
+                  () => _FilterChips(
+                    selected: controller.selectedFilter.value,
+                    onSelected: controller.setFilter,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: _green,
+                        strokeWidth: 2.5,
+                      ),
+                    );
+                  }
+
+                  if (controller.groups.isEmpty) {
+                    return const _EmptyHistory();
+                  }
+
+                  return RefreshIndicator(
+                    color: _green,
+                    onRefresh: controller.loadHistory,
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
+                      itemCount: controller.groups.length,
+                      itemBuilder: (context, index) {
+                        final group = controller.groups[index];
+                        return _DaySection(group: group);
+                      },
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          child: ScannerBottomNavBar(
+            selectedIndex: 0,
+            onTabChanged: onMainTabChanged,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HistoryHeader extends StatelessWidget {
+  const _HistoryHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'History',
+          style: TextStyle(
+            color: HistoryScreen._textDark,
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.8,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          'Recent employee check-ins',
+          style: TextStyle(
+            color: HistoryScreen._muted,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatsRow extends StatelessWidget {
+  final int todayCount;
+  final int weekCount;
+
+  const _StatsRow({
+    required this.todayCount,
+    required this.weekCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          Expanded(
+            child: _StatCard(
+              label: 'Today',
+              value: '$todayCount',
+              icon: Icons.today_rounded,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _StatCard(
+              label: 'This week',
+              value: '$weekCount',
+              icon: Icons.date_range_rounded,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: HistoryScreen._green.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: HistoryScreen._green, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: HistoryScreen._muted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: HistoryScreen._textDark,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChips extends StatelessWidget {
+  final HistoryFilter selected;
+  final ValueChanged<HistoryFilter> onSelected;
+
+  const _FilterChips({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _Chip(
+          label: 'All',
+          isSelected: selected == HistoryFilter.all,
+          onTap: () => onSelected(HistoryFilter.all),
+        ),
+        const SizedBox(width: 8),
+        _Chip(
+          label: 'Today',
+          isSelected: selected == HistoryFilter.today,
+          onTap: () => onSelected(HistoryFilter.today),
+        ),
+        const SizedBox(width: 8),
+        _Chip(
+          label: 'This week',
+          isSelected: selected == HistoryFilter.week,
+          onTap: () => onSelected(HistoryFilter.week),
+        ),
+      ],
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _Chip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? HistoryScreen._green : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? HistoryScreen._green
+                : const Color(0xFFE5E7EB),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : HistoryScreen._muted,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DaySection extends StatelessWidget {
+  final HistoryDayGroup group;
+
+  const _DaySection({required this.group});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10, top: 8),
+          child: Row(
+            children: [
+              Text(
+                group.title,
+                style: const TextStyle(
+                  color: HistoryScreen._textDark,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                group.subtitle,
+                style: const TextStyle(
+                  color: HistoryScreen._muted,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ...group.records.map((r) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _HistoryTile(record: r),
+            )),
+      ],
+    );
+  }
+}
+
+class _HistoryTile extends StatelessWidget {
+  final AttendanceRecord record;
+
+  const _HistoryTile({required this.record});
+
+  @override
+  Widget build(BuildContext context) {
+    final initials = _initials(record.employeeName);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4ADE80), Color(0xFF16A34A)],
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              initials,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  record.employeeName,
+                  style: const TextStyle(
+                    color: HistoryScreen._textDark,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${record.employeeId} · ${record.role}',
+                  style: const TextStyle(
+                    color: HistoryScreen._muted,
+                    fontSize: 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: HistoryScreen._green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.login_rounded,
+                      size: 12,
+                      color: HistoryScreen._green,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'In',
+                      style: TextStyle(
+                        color: HistoryScreen._green,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                record.timeLabel,
+                style: const TextStyle(
+                  color: HistoryScreen._muted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _initials(String name) {
+    final parts =
+        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return '${parts.first[0]}${parts.elementAt(1)[0]}'.toUpperCase();
+  }
+}
+
+class _EmptyHistory extends StatelessWidget {
+  const _EmptyHistory();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.history_rounded,
+              size: 56,
+              color: HistoryScreen._muted.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No check-ins yet',
+              style: TextStyle(
+                color: HistoryScreen._textDark,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Check-ins for this period will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: HistoryScreen._muted.withValues(alpha: 0.9),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

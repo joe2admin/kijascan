@@ -5,6 +5,9 @@ class QrScannerBindings extends Bindings {
   @override
   void dependencies(){
     // lazyPut ensures the controller is initialized only when needed
-    Get.lazyPut<QrScannerController>(() => QrScannerController());
+    Get.lazyPut<QrScannerController>(
+      () => QrScannerController(),
+      fenix: true,
+    );
   }
 }
