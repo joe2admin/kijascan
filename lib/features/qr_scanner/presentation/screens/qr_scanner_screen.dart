@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/utils/constants/colors.dart';
+import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../controllers/qr_scanner_controller.dart';  
+import '../../controllers/qr_scanner_controller.dart';
 import '../widgets/scanner_viewport_overlay.dart';
 
 class QrScannerScreen extends GetView<QrScannerController> {
   const QrScannerScreen({super.key});
-
-  static const Color _green = Color(0xFF22C55E);
 
   static const double _scanWindowSize = 300;
 
@@ -29,59 +29,59 @@ class QrScannerScreen extends GetView<QrScannerController> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-            MobileScanner(
-              controller: controller.cameraController,
-              fit: BoxFit.cover,
-              scanWindow: scanWindow,
-              onDetect: controller.onDetect,
-              errorBuilder: (context, error, child) {
-                return _CameraErrorView(
-                  message: controller.scannerErrorMessage(error),
-                  onRetry: controller.initializeCamera,
-                  onSettings: controller.goToAppSettings,
-                );
-              },
-              overlayBuilder: (context, constraints) {
-                return ValueListenableBuilder<MobileScannerState>(
-                  valueListenable: controller.cameraController,
-                  builder: (context, state, _) {
-                    if (!state.isInitialized ||
-                        !state.isRunning ||
-                        state.error != null) {
-                      return const SizedBox.shrink();
-                    }
-                    return ScannerViewportOverlay(scanWindow: scanWindow);
-                  },
-                );
-              },
-            ),
-            Obx(() {
-              final message = controller.cameraError.value;
-              if (message == null || controller.hasCameraPermission.value) {
-                return const SizedBox.shrink();
-              }
+          MobileScanner(
+            controller: controller.cameraController,
+            fit: BoxFit.cover,
+            scanWindow: scanWindow,
+            onDetect: controller.onDetect,
+            errorBuilder: (context, error, child) {
               return _CameraErrorView(
-                message: message,
+                message: controller.scannerErrorMessage(error),
                 onRetry: controller.initializeCamera,
                 onSettings: controller.goToAppSettings,
               );
-            }),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  _TopBar(
-                    onTorch: controller.toggleTorch,
-                    isTorchOn: controller.isTorchOn,
-                  ),
-                  const Spacer(),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: _ScanHint(),
-                  ),
-                ],
-              ),
+            },
+            overlayBuilder: (context, constraints) {
+              return ValueListenableBuilder<MobileScannerState>(
+                valueListenable: controller.cameraController,
+                builder: (context, state, _) {
+                  if (!state.isInitialized ||
+                      !state.isRunning ||
+                      state.error != null) {
+                    return const SizedBox.shrink();
+                  }
+                  return ScannerViewportOverlay(scanWindow: scanWindow);
+                },
+              );
+            },
+          ),
+          Obx(() {
+            final message = controller.cameraError.value;
+            if (message == null || controller.hasCameraPermission.value) {
+              return const SizedBox.shrink();
+            }
+            return _CameraErrorView(
+              message: message,
+              onRetry: controller.initializeCamera,
+              onSettings: controller.goToAppSettings,
+            );
+          }),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                _TopBar(
+                  onTorch: controller.toggleTorch,
+                  isTorchOn: controller.isTorchOn,
+                ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: _ScanHint(),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -102,7 +102,7 @@ class _CameraErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Colors.black,
+      color: TColors.dark,
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -128,8 +128,8 @@ class _CameraErrorView extends StatelessWidget {
               FilledButton(
                 onPressed: onRetry,
                 style: FilledButton.styleFrom(
-                  backgroundColor: QrScannerScreen._green,
-                  foregroundColor: Colors.white,
+                  backgroundColor: TColors.primary,
+                  foregroundColor: TColors.light,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 28,
                     vertical: 12,
@@ -142,9 +142,7 @@ class _CameraErrorView extends StatelessWidget {
                 onPressed: onSettings,
                 child: Text(
                   'Open Settings',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                  ),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 ),
               ),
             ],
@@ -159,10 +157,7 @@ class _TopBar extends StatelessWidget {
   final VoidCallback onTorch;
   final RxBool isTorchOn;
 
-  const _TopBar({
-    required this.onTorch,
-    required this.isTorchOn,
-  });
+  const _TopBar({required this.onTorch, required this.isTorchOn});
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +172,8 @@ class _TopBar extends StatelessWidget {
                 const Text(
                   'KijaScan',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
+                    color: TColors.softGrey,
+                    fontSize: TSizes.fontSizeXl,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.6,
                   ),
@@ -213,10 +208,7 @@ class _GlassIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _GlassIconButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _GlassIconButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -229,9 +221,7 @@ class _GlassIconButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.14),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
         child: Icon(icon, color: Colors.white, size: 22),
       ),
@@ -250,30 +240,28 @@ class _ScanHint extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: TSizes.xs*2,
+            height: TSizes.xs*2,
             decoration: const BoxDecoration(
-              color: QrScannerScreen._green,
+              color: TColors.primary,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: TSizes.spaceBtwItems),
           Flexible(
             child: Text(
               'Point at the employee QR code',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 13,
+                fontSize: TSizes.fontSizeSm,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.1,
               ),

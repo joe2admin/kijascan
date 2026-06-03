@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kijascan/utils/constants/sizes.dart';
 
 /// Ticket-style card: date header, dashed divider with side notches, detail grid.
 class EmployeeTicketCard extends StatelessWidget {
@@ -98,14 +99,8 @@ class _TicketDividerRow extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 14),
             child: _DashedLine(),
           ),
-          Positioned(
-            left: -10,
-            child: _SideNotch(color: backgroundColor),
-          ),
-          Positioned(
-            right: -10,
-            child: _SideNotch(color: backgroundColor),
-          ),
+          Positioned(left: -10, child: _SideNotch(color: backgroundColor)),
+          Positioned(right: -10, child: _SideNotch(color: backgroundColor)),
         ],
       ),
     );
@@ -184,7 +179,7 @@ class _DetailsGrid extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: TSizes.defaultSpace),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -199,7 +194,7 @@ class _DetailsGrid extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _DetailCell(
-                label: 'Checked-in Time',
+                label: 'Clocked-In Time',
                 value: checkedInTime,
                 labelColor: labelColor,
                 valueColor: valueColor,
@@ -207,13 +202,13 @@ class _DetailsGrid extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 22),
-        _DetailCell(
-          label: 'Date',
-          value: date,
-          labelColor: labelColor,
-          valueColor: valueColor,
-        ),
+        // const SizedBox(height: 22),
+        // _DetailCell(
+        //   label: 'Date',
+        //   value: date,
+        //   labelColor: labelColor,
+        //   valueColor: valueColor,
+        // ),
       ],
     );
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/utils/constants/colors.dart';
+import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 import '../../controllers/check_in_controller.dart';
 import '../../models/scanned_employee.dart';
 import '../widgets/employee_ticket_card.dart';
@@ -8,32 +11,22 @@ import '../widgets/employee_ticket_card.dart';
 class CheckInScreen extends GetView<CheckInController> {
   const CheckInScreen({super.key});
 
-  static const Color _green = Color(0xFF22C55E);
-  static const Color _darkBg = Color(0xFF0A120D);
-  static const Color _darkCard = Color(0xFF0F1A12);
-  static const Color _labelGrey = Color(0xFF9CA3AF);
-  static const Color _textDark = Color(0xFF1F2937);
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? _darkBg : const Color(0xFFF3F4F6);
-    final card = isDark ? _darkCard : Colors.white;
-    final textPrimary = isDark ? Colors.white : _textDark;
-    final textMuted = isDark ? Colors.white54 : _labelGrey;
+    final dark = THelperFunctions.isDarkMode(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: bg,
+        backgroundColor: dark ? TColors.dark : TColors.light,
         appBar: AppBar(
-          backgroundColor: bg,
+          backgroundColor: dark ? TColors.dark : TColors.softGrey,
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: textPrimary,
+              color: dark ? TColors.softGrey: TColors.black,
               size: 20,
             ),
             onPressed: controller.cancel,
@@ -41,8 +34,8 @@ class CheckInScreen extends GetView<CheckInController> {
           title: Text(
             'Employee details',
             style: TextStyle(
-              color: textPrimary,
-              fontSize: 17,
+              color: dark ? TColors.white : TColors.black,
+              fontSize: TSizes.fontSizeMd,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.3,
             ),
@@ -56,13 +49,16 @@ class CheckInScreen extends GetView<CheckInController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(
-                    color: _green,
+                    color: TColors.primary,
                     strokeWidth: 2.5,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Looking up employee…',
-                    style: TextStyle(color: textMuted, fontSize: 14),
+                    style: TextStyle(
+                      color: TColors.darkGrey,
+                      fontSize: TSizes.fontSizeSm,
+                    ),
                   ),
                 ],
               ),
@@ -74,7 +70,7 @@ class CheckInScreen extends GetView<CheckInController> {
             return Center(
               child: Text(
                 'Could not load employee details.',
-                style: TextStyle(color: textMuted),
+                style: TextStyle(color: TColors.darkGrey),
               ),
             );
           }
@@ -88,15 +84,19 @@ class CheckInScreen extends GetView<CheckInController> {
                     children: [
                       _ProfileHeader(
                         employee: employee,
-                        textPrimary: textPrimary,
-                        isDark: isDark,
+                        textPrimary: dark ? TColors.softGrey : TColors.black,
+                        isDark: dark,
                       ),
                       const SizedBox(height: 28),
                       EmployeeTicketCard(
-                        cardColor: card,
-                        backgroundColor: bg,
-                        labelColor: textMuted,
-                        valueColor: textPrimary,
+                        cardColor: dark
+                            ? const Color.fromARGB(255, 25, 30, 27)
+                            : TColors.white,
+                        backgroundColor: dark
+                            ? TColors.dark
+                            : TColors.softGrey,
+                        labelColor: dark ? TColors.white : TColors.dark,
+                        valueColor: dark ? TColors.white : TColors.dark,
                         headerDate: employee.attendanceDate,
                         employeeId: employee.id,
                         department: employee.department,
@@ -112,7 +112,7 @@ class CheckInScreen extends GetView<CheckInController> {
                 () => _CheckInBar(
                   isSubmitting: controller.isSubmitting.value,
                   onCheckIn: controller.submitCheckIn,
-                  isDark: isDark,
+                  isDark: dark,
                 ),
               ),
             ],
@@ -244,8 +244,7 @@ class _EmployeeAvatar extends StatelessWidget {
   }
 
   String _initials(String name) {
-    final parts =
-        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
     if (parts.isEmpty) return '?';
     if (parts.length == 1) return parts.first[0].toUpperCase();
     return '${parts.first[0]}${parts.elementAt(1)[0]}'.toUpperCase();
@@ -267,19 +266,12 @@ class _CheckInBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final barBg = isDark ? const Color(0xFF0F1A12) : Colors.white;
+    final barBg = isDark ? TColors.dark : TColors.softGrey;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
         color: barBg,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, -4),
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,
@@ -309,7 +301,7 @@ class _CheckInBar extends StatelessWidget {
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: TColors.softGrey,
                       ),
                     )
                   : const Text(

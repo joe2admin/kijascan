@@ -3,12 +3,14 @@ import 'package:get/get.dart';
 import 'package:kijascan/features/main_shell/controllers/main_shell_controller.dart';
 import 'package:kijascan/features/qr_scanner/controllers/qr_scanner_controller.dart';
 import 'package:kijascan/routes/app_routes.dart';
+import 'package:kijascan/utils/constants/colors.dart';
+import 'package:kijascan/utils/constants/sizes.dart';
 
 class CheckInSuccessScreen extends StatelessWidget {
   const CheckInSuccessScreen({super.key});
 
-  static const Color _green = Color(0xFF22C55E);
-  static const Color _darkBg = Color(0xFF0A120D);
+  static const Color _green = TColors.primary;
+  static const Color _darkBg = TColors.dark;
 
   static void _returnToScanner() {
     Get.until((route) => route.settings.name == AppRoutes.main);
@@ -67,7 +69,7 @@ class CheckInSuccessScreen extends StatelessWidget {
                 style: TextStyle(
                   color: isDark ? Colors.white70 : Colors.black54,
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
@@ -117,7 +119,7 @@ class CheckInSuccessScreen extends StatelessWidget {
                     'Done',
                     style: TextStyle(
                       color: isDark ? Colors.white54 : Colors.black45,
-                      fontSize: 15,
+                      fontSize: TSizes.fontSizeMd,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -140,7 +142,6 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const green = Color(0xFF22C55E);
 
     return GestureDetector(
       onTap: onTap,
@@ -149,11 +150,11 @@ class _PrimaryButton extends StatelessWidget {
         width: double.infinity,
         height: 52,
         decoration: BoxDecoration(
-          color: green,
+          color: TColors.primary,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: green.withOpacity(0.3),
+              color: TColors.primary.withValues(alpha: 0.3),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -164,7 +165,7 @@ class _PrimaryButton extends StatelessWidget {
           label,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: TSizes.fontSizeMd,
             fontWeight: FontWeight.w700,
           ),
         ),
