@@ -2,14 +2,11 @@ import 'package:get/get.dart';
 import 'package:kijascan/routes/app_routes.dart';
 import '../models/scanned_employee.dart';
 
-enum CheckInAction { checkIn, checkOut }
-
 class CheckInController extends GetxController {
   final isLoadingEmployee = true.obs;
   final isSubmitting = false.obs;
   final employee = Rxn<ScannedEmployee>();
   final statusMessage = ''.obs;
-  final lastAction = Rxn<CheckInAction>();
 
   late final String _qrPayload;
 
@@ -27,15 +24,54 @@ class CheckInController extends GetxController {
     isLoadingEmployee.value = false;
   }
 
+  String _formatToday() {
+    final now = DateTime.now();
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${now.day} ${months[now.month - 1]} ${now.year}, ${weekdays[now.weekday - 1]}';
+  }
+
+  String _formatTimeNow() {
+    final now = DateTime.now();
+    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final minute = now.minute.toString().padLeft(2, '0');
+    final period = now.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
+
   ScannedEmployee _resolveEmployee(String payload) {
     final key = payload.trim().toLowerCase();
+    final today = _formatToday();
+
     const mockEmployees = <String, ScannedEmployee>{
       'user_uuid_987654321': ScannedEmployee(
         id: 'EMP-1042',
         fullName: 'Amina Okello',
         role: 'Field Officer',
         department: 'Operations',
-        lastCheckInAt: 'Today, 08:12 AM',
+        attendanceDate: '3 Jun 2026, Wednesday',
+        checkedInTime: '8:12 AM',
         isCurrentlyCheckedIn: true,
       ),
       'emp-2048': ScannedEmployee(
@@ -43,18 +79,39 @@ class CheckInController extends GetxController {
         fullName: 'James Mwangi',
         role: 'Supervisor',
         department: 'Logistics',
-        lastCheckInAt: 'Yesterday, 5:45 PM',
+        attendanceDate: '2 Jun 2026, Tuesday',
         isCurrentlyCheckedIn: false,
       ),
     };
 
     if (mockEmployees.containsKey(key)) {
-      return mockEmployees[key]!;
+      final e = mockEmployees[key]!;
+      return ScannedEmployee(
+        id: e.id,
+        fullName: e.fullName,
+        role: e.role,
+        department: e.department,
+        attendanceDate: today,
+        imageUrl: e.imageUrl,
+        checkedInTime: e.checkedInTime,
+        isCurrentlyCheckedIn: e.isCurrentlyCheckedIn,
+      );
     }
 
     for (final entry in mockEmployees.entries) {
-      if (key.contains(entry.key) || key.contains(entry.value.id.toLowerCase())) {
-        return entry.value;
+      if (key.contains(entry.key) ||
+          key.contains(entry.value.id.toLowerCase())) {
+        final e = entry.value;
+        return ScannedEmployee(
+          id: e.id,
+          fullName: e.fullName,
+          role: e.role,
+          department: e.department,
+          attendanceDate: today,
+          imageUrl: e.imageUrl,
+          checkedInTime: e.checkedInTime,
+          isCurrentlyCheckedIn: e.isCurrentlyCheckedIn,
+        );
       }
     }
 
@@ -67,33 +124,33 @@ class CheckInController extends GetxController {
       fullName: 'Scanned Employee',
       role: 'Staff',
       department: 'General',
+      attendanceDate: today,
       isCurrentlyCheckedIn: false,
     );
   }
 
-  Future<void> submitCheckIn(CheckInAction action) async {
+  Future<void> submitCheckIn() async {
     if (isSubmitting.value || employee.value == null) return;
 
     isSubmitting.value = true;
-    lastAction.value = action;
-    statusMessage.value = action == CheckInAction.checkIn
-        ? 'Recording check-in…'
-        : 'Recording check-out…';
+    statusMessage.value = 'Recording check-in…';
 
     await Future.delayed(const Duration(seconds: 1));
 
+    final checkedInAt = _formatTimeNow();
+    final name = employee.value!.fullName;
+
     isSubmitting.value = false;
-    statusMessage.value = action == CheckInAction.checkIn
-        ? 'Check-in recorded successfully.'
-        : 'Check-out recorded successfully.';
+    statusMessage.value = 'Check-in recorded successfully.';
 
     Get.offNamedUntil(
       AppRoutes.checkInSuccess,
       (route) => route.settings.name == AppRoutes.qrScanner,
       arguments: {
         'message': statusMessage.value,
-        'employeeName': employee.value!.fullName,
-        'action': action.name,
+        'employeeName': name,
+        'checkedInTime': checkedInAt,
+        'date': employee.value!.attendanceDate,
       },
     );
   }

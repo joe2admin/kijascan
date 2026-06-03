@@ -21,7 +21,8 @@ class CheckInSuccessScreen extends StatelessWidget {
     final args = Get.arguments as Map<String, dynamic>? ?? {};
     final message = args['message'] as String? ?? 'Attendance recorded.';
     final employeeName = args['employeeName'] as String? ?? 'Employee';
-    final isCheckIn = (args['action'] as String?) != 'checkOut';
+    final checkedInTime = args['checkedInTime'] as String?;
+    final date = args['date'] as String?;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -39,15 +40,15 @@ class CheckInSuccessScreen extends StatelessWidget {
                   color: _green.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  isCheckIn ? Icons.login_rounded : Icons.logout_rounded,
+                child: const Icon(
+                  Icons.login_rounded,
                   color: _green,
                   size: 40,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
-                isCheckIn ? 'Checked in' : 'Checked out',
+                'Checked in',
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF0F1A12),
                   fontSize: 26,
@@ -74,6 +75,29 @@ class CheckInSuccessScreen extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
+              if (checkedInTime != null) ...[
+                const SizedBox(height: 20),
+                Text(
+                  'Checked-in at $checkedInTime',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : const Color(0xFF374151),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+              if (date != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  date,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black45,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
               const Spacer(flex: 3),
               _PrimaryButton(
                 label: 'Scan Another',

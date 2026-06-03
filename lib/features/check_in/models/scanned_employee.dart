@@ -3,7 +3,9 @@ class ScannedEmployee {
   final String fullName;
   final String role;
   final String department;
-  final String? lastCheckInAt;
+  final String attendanceDate;
+  final String? imageUrl;
+  final String? checkedInTime;
   final bool isCurrentlyCheckedIn;
 
   const ScannedEmployee({
@@ -11,7 +13,12 @@ class ScannedEmployee {
     required this.fullName,
     required this.role,
     required this.department,
-    this.lastCheckInAt,
+    required this.attendanceDate,
+    this.imageUrl,
+    this.checkedInTime,
     this.isCurrentlyCheckedIn = false,
   });
+
+  String get checkedInTimeDisplay =>
+      checkedInTime?.isNotEmpty == true ? checkedInTime! : '—';
 }

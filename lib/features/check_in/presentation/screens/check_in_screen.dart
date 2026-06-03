@@ -3,23 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../controllers/check_in_controller.dart';
 import '../../models/scanned_employee.dart';
+import '../widgets/employee_ticket_card.dart';
 
 class CheckInScreen extends GetView<CheckInController> {
   const CheckInScreen({super.key});
 
   static const Color _green = Color(0xFF22C55E);
-  static const Color _greenDeep = Color(0xFF16A34A);
   static const Color _darkBg = Color(0xFF0A120D);
   static const Color _darkCard = Color(0xFF0F1A12);
-  static const Color _darkSurface = Color(0xFF141F17);
+  static const Color _labelGrey = Color(0xFF9CA3AF);
+  static const Color _textDark = Color(0xFF1F2937);
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? _darkBg : const Color(0xFFF8FAF9);
+    final bg = isDark ? _darkBg : const Color(0xFFF3F4F6);
     final card = isDark ? _darkCard : Colors.white;
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F1A12);
-    final textMuted = isDark ? Colors.white60 : Colors.black54;
+    final textPrimary = isDark ? Colors.white : _textDark;
+    final textMuted = isDark ? Colors.white54 : _labelGrey;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
@@ -30,16 +31,19 @@ class CheckInScreen extends GetView<CheckInController> {
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded,
-                color: textPrimary, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: textPrimary,
+              size: 20,
+            ),
             onPressed: controller.cancel,
           ),
           title: Text(
-            'Confirm attendance',
+            'Employee details',
             style: TextStyle(
               color: textPrimary,
               fontSize: 17,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: -0.3,
             ),
           ),
@@ -75,80 +79,42 @@ class CheckInScreen extends GetView<CheckInController> {
             );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _EmployeeCard(
-                  employee: employee,
-                  cardColor: card,
-                  surfaceColor: isDark ? _darkSurface : const Color(0xFFF1F5F2),
-                  textPrimary: textPrimary,
-                  textMuted: textMuted,
-                  accentColor: _green,
-                ),
-                const SizedBox(height: 20),
-                _StatusBanner(
-                  employee: employee,
-                  isDark: isDark,
-                  accentColor: _green,
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  'Record attendance',
-                  style: TextStyle(
-                    color: textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Choose whether this person is arriving or leaving.',
-                  style: TextStyle(color: textMuted, fontSize: 13),
-                ),
-                const SizedBox(height: 16),
-                Obx(() {
-                  final submitting = controller.isSubmitting.value;
-                  final lastAction = controller.lastAction.value;
-
-                  return Column(
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+                  child: Column(
                     children: [
-                      _ActionButton(
-                        label: 'Check In',
-                        icon: Icons.login_rounded,
-                        filled: true,
-                        color: _green,
-                        textColor: Colors.white,
-                        isLoading: submitting &&
-                            lastAction == CheckInAction.checkIn,
-                        onTap: submitting
-                            ? null
-                            : () => controller.submitCheckIn(
-                                  CheckInAction.checkIn,
-                                ),
+                      _ProfileHeader(
+                        employee: employee,
+                        textPrimary: textPrimary,
+                        isDark: isDark,
                       ),
-                      const SizedBox(height: 12),
-                      _ActionButton(
-                        label: 'Check Out',
-                        icon: Icons.logout_rounded,
-                        filled: false,
-                        color: _greenDeep,
-                        textColor: _greenDeep,
-                        isLoading: submitting &&
-                            lastAction == CheckInAction.checkOut,
-                        onTap: submitting
-                            ? null
-                            : () => controller.submitCheckIn(
-                                  CheckInAction.checkOut,
-                                ),
+                      const SizedBox(height: 28),
+                      EmployeeTicketCard(
+                        cardColor: card,
+                        backgroundColor: bg,
+                        labelColor: textMuted,
+                        valueColor: textPrimary,
+                        headerDate: employee.attendanceDate,
+                        employeeId: employee.id,
+                        positionRole: employee.role,
+                        checkedInTime: employee.checkedInTimeDisplay,
+                        date: employee.attendanceDate,
                       ),
                     ],
-                  );
-                }),
-              ],
-            ),
+                  ),
+                ),
+              ),
+              Obx(
+                () => _CheckInBar(
+                  isSubmitting: controller.isSubmitting.value,
+                  onCheckIn: controller.submitCheckIn,
+                  isDark: isDark,
+                ),
+              ),
+            ],
           );
         }),
       ),
@@ -156,104 +122,112 @@ class CheckInScreen extends GetView<CheckInController> {
   }
 }
 
-class _EmployeeCard extends StatelessWidget {
+/// Centered avatar + full name (profile inspiration).
+class _ProfileHeader extends StatelessWidget {
   final ScannedEmployee employee;
-  final Color cardColor;
-  final Color surfaceColor;
   final Color textPrimary;
-  final Color textMuted;
-  final Color accentColor;
+  final bool isDark;
 
-  const _EmployeeCard({
+  const _ProfileHeader({
     required this.employee,
-    required this.cardColor,
-    required this.surfaceColor,
     required this.textPrimary,
-    required this.textMuted,
-    required this.accentColor,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final initials = _initials(employee.fullName);
+    return Column(
+      children: [
+        _EmployeeAvatar(
+          name: employee.fullName,
+          imageUrl: employee.imageUrl,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          employee.fullName,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: textPrimary,
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.6,
+            height: 1.15,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EmployeeAvatar extends StatelessWidget {
+  final String name;
+  final String? imageUrl;
+  final bool isDark;
+
+  const _EmployeeAvatar({
+    required this.name,
+    required this.imageUrl,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 112.0;
+    final initials = _initials(name);
+
+    Widget child;
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      child = ClipOval(
+        child: Image.network(
+          imageUrl!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _initialsAvatar(initials, size),
+        ),
+      );
+    } else {
+      child = _initialsAvatar(initials, size);
+    }
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accentColor.withOpacity(0.2)),
+        shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.1),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              initials,
-              style: TextStyle(
-                color: accentColor,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  employee.fullName,
-                  style: TextStyle(
-                    color: textPrimary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  employee.role,
-                  style: TextStyle(
-                    color: textMuted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: surfaceColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${employee.department} · ${employee.id}',
-                    style: TextStyle(
-                      color: textMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: child,
+    );
+  }
+
+  Widget _initialsAvatar(String initials, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF4ADE80), Color(0xFF16A34A)],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 36,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -267,141 +241,76 @@ class _EmployeeCard extends StatelessWidget {
   }
 }
 
-class _StatusBanner extends StatelessWidget {
-  final ScannedEmployee employee;
+class _CheckInBar extends StatelessWidget {
+  final bool isSubmitting;
+  final VoidCallback onCheckIn;
   final bool isDark;
-  final Color accentColor;
 
-  const _StatusBanner({
-    required this.employee,
+  const _CheckInBar({
+    required this.isSubmitting,
+    required this.onCheckIn,
     required this.isDark,
-    required this.accentColor,
   });
+
+  static const Color _green = Color(0xFF22C55E);
 
   @override
   Widget build(BuildContext context) {
-    final checkedIn = employee.isCurrentlyCheckedIn;
-    final bg = checkedIn
-        ? accentColor.withOpacity(isDark ? 0.12 : 0.08)
-        : (isDark ? Colors.white10 : Colors.black.withOpacity(0.04));
-    final icon = checkedIn ? Icons.schedule_rounded : Icons.info_outline_rounded;
-    final title = checkedIn ? 'Currently checked in' : 'Not checked in';
-    final subtitle = employee.lastCheckInAt != null
-        ? 'Last activity: ${employee.lastCheckInAt}'
-        : 'No recent attendance on file';
+    final barBg = isDark ? const Color(0xFF0F1A12) : Colors.white;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: checkedIn
-              ? accentColor.withOpacity(0.25)
-              : Colors.transparent,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor, size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : const Color(0xFF0F1A12),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: isDark ? Colors.white54 : Colors.black45,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+        color: barBg,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool filled;
-  final Color color;
-  final Color textColor;
-  final bool isLoading;
-  final VoidCallback? onTap;
-
-  const _ActionButton({
-    required this.label,
-    required this.icon,
-    required this.filled,
-    required this.color,
-    required this.textColor,
-    required this.isLoading,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedOpacity(
-        opacity: onTap == null && !isLoading ? 0.5 : 1,
-        duration: const Duration(milliseconds: 150),
-        child: Container(
-          height: 52,
-          decoration: BoxDecoration(
-            color: filled ? color : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            border: filled ? null : Border.all(color: color, width: 1.5),
-            boxShadow: filled
-                ? [
-                    BoxShadow(
-                      color: color.withOpacity(0.28),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+      child: SafeArea(
+        top: false,
+        child: GestureDetector(
+          onTap: isSubmitting ? null : onCheckIn,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedOpacity(
+            opacity: isSubmitting ? 0.7 : 1,
+            duration: const Duration(milliseconds: 150),
+            child: Container(
+              height: 54,
+              decoration: BoxDecoration(
+                color: _green,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: _green.withValues(alpha: 0.32),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: isSubmitting
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Check In',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
                     ),
-                  ]
-                : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isLoading)
-                SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: filled ? Colors.white : color,
-                  ),
-                )
-              else ...[
-                Icon(icon, color: filled ? Colors.white : textColor, size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: filled ? Colors.white : textColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
       ),
