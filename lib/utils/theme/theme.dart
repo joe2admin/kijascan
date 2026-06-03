@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kijascan/utils/constants/colors.dart';
 
 import 'custom_themes/appbar_theme.dart';
 import 'custom_themes/elevated_button_theme.dart';
@@ -10,7 +11,7 @@ class TAppTheme {
   TAppTheme._();
 
   static ThemeData lightTheme = ThemeData(
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: TColors.light,
     brightness: Brightness.light,
     textTheme: TTextThemes.lightTextTheme,
     appBarTheme: TAppBarTheme.lightAppBarTheme,
@@ -21,6 +22,7 @@ class TAppTheme {
   );
 
   static ThemeData darkTheme = ThemeData(
+    // scaffoldBackgroundColor: TColors.dark,
     brightness: Brightness.dark,
     textTheme: TTextThemes.darkTextTheme,
     appBarTheme: TAppBarTheme.darkAppBarTheme,

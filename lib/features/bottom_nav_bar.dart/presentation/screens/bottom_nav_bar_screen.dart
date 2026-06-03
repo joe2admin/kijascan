@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kijascan/utils/constants/colors.dart';
+import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
 class ScannerBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -10,20 +13,19 @@ class ScannerBottomNavBar extends StatelessWidget {
     required this.onTabChanged,
   });
 
-  static const Color _green = Color(0xFF22C55E);
-
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
+        color: dark ? TColors.dark : TColors.light,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 24,
+            color: dark ? TColors.textPrimary : TColors.grey,
+            blurRadius: TSizes.fontSizeXl,
             offset: const Offset(0, 8),
           ),
         ],
@@ -75,7 +77,9 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? ScannerBottomNavBar._green : const Color(0xFF9CA3AF);
+    final color = isActive
+        ? TColors.primary
+        : TColors.darkGrey.withValues(alpha: 0.8);
 
     return GestureDetector(
       onTap: onTap,
@@ -86,14 +90,14 @@ class _NavItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: isActive
-              ? ScannerBottomNavBar._green.withValues(alpha: 0.12)
+              ? TColors.primary.withValues(alpha: 0.12)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(TSizes.borderRadiusXl),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 22),
+            Icon(icon, color: color, size: TSizes.iconMd),
             const SizedBox(height: 2),
             Text(
               label,
