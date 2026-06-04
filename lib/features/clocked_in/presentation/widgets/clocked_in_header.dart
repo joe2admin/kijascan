@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
-import 'package:kijascan/utils/constants/sizes.dart';
 
-class HistoryHeader extends StatelessWidget {
+class ClockedInHeader extends StatelessWidget {
+  const ClockedInHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class HistoryHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'History',
+          'Clocked-In',
           style: TextStyle(
             color: dark ? TColors.light : TColors.dark,
             fontSize: 28,
@@ -22,7 +22,7 @@ class HistoryHeader extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Recent employee check-ins',
+          'People currently clocked in',
           style: TextStyle(
             color: dark ? TColors.light : TColors.dark,
             fontSize: 14,

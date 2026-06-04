@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kijascan/features/history/models/attendance_record.dart';
-import 'package:kijascan/utils/constants/colors.dart%20%20';
+import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
+import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
 
-class ModalProfileHeader extends StatelessWidget {
-  final AttendanceRecord record;
+class ClockedInProfileHeader extends StatelessWidget {
+  final ClockedInRecord record;
 
-  const ModalProfileHeader({required this.record});
+  const ClockedInProfileHeader({super.key, required this.record});
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +66,11 @@ class ModalProfileHeader extends StatelessWidget {
   }
 
   String _initials(String name) {
-    final parts =
-        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return '?';
     if (parts.length == 1) {
       return parts.first.substring(0, 1).toUpperCase();

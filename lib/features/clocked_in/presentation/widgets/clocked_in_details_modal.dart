@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/features/check_in/presentation/widgets/employee_ticket_card.dart';
-import 'package:kijascan/features/history/controllers/history_controller.dart';
-import 'package:kijascan/features/history/models/attendance_record.dart';
-import 'package:kijascan/features/history/presentation/widgets/check_out_bar.dart';
-import 'package:kijascan/features/history/presentation/widgets/modal_profile_header.dart';
+import 'package:kijascan/features/clocked_in/controllers/clocked_in_controller.dart';
+import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
+import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_check_out_bar.dart';
+import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_profile_header.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
 
-class EmployeeDetailsModal extends GetView<HistoryController> {
-  final AttendanceRecord record;
+class ClockedInDetailsModal extends GetView<ClockedInController> {
+  final ClockedInRecord record;
 
-  const EmployeeDetailsModal({super.key, required this.record});
+  const ClockedInDetailsModal({super.key, required this.record});
 
-  static Future<void> show(AttendanceRecord record) {
+  static Future<void> show(ClockedInRecord record) {
     return Get.bottomSheet(
-      EmployeeDetailsModal(record: record),
+      ClockedInDetailsModal(record: record),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       isDismissible: true,
@@ -54,7 +54,7 @@ class EmployeeDetailsModal extends GetView<HistoryController> {
               padding: EdgeInsets.fromLTRB(24, 20, 24, 16 + bottomInset),
               child: Column(
                 children: [
-                  ModalProfileHeader(record: record),
+                  ClockedInProfileHeader(record: record),
                   const SizedBox(height: 24),
                   EmployeeTicketCard(
                     cardColor: Colors.white,
@@ -73,7 +73,7 @@ class EmployeeDetailsModal extends GetView<HistoryController> {
             ),
           ),
           Obx(
-            () => CheckOutBar(
+            () => ClockedInCheckOutBar(
               isSubmitting: controller.isCheckingOut.value,
               onCheckOut: () => controller.submitCheckOut(record),
             ),

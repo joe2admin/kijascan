@@ -8,8 +8,8 @@ class MainShellController extends GetxController {
   void setTab(int index) {
     if (index == 2) {
       Get.snackbar(
-        'Team',
-        'Team view is coming soon.',
+        'History',
+        'History view is coming soon.',
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 2),

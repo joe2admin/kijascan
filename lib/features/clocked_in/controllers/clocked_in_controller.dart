@@ -1,44 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/attendance_record.dart';
+import '../models/clocked_in_record.dart';
 
-enum HistoryFilter { all, today, week }
+enum ClockedInFilter { all, today, week }
 
-class HistoryController extends GetxController {
+class ClockedInController extends GetxController {
   final isLoading = true.obs;
-  final selectedFilter = HistoryFilter.today.obs;
-  final groups = <HistoryDayGroup>[].obs;
+  final selectedFilter = ClockedInFilter.today.obs;
+  final groups = <ClockedInDayGroup>[].obs;
   final todayCount = 0.obs;
   final weekCount = 0.obs;
   final isCheckingOut = false.obs;
 
-  List<HistoryDayGroup> _allGroups = [];
+  List<ClockedInDayGroup> _allGroups = [];
 
   @override
   void onInit() {
     super.onInit();
-    loadHistory();
+    loadClockedIn();
   }
 
-  Future<void> loadHistory() async {
+  Future<void> loadClockedIn() async {
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 500));
-    _allGroups = _mockHistory();
+    _allGroups = _mockClockedIn();
     _updateStats();
     _applyFilter();
     isLoading.value = false;
   }
 
-  void setFilter(HistoryFilter filter) {
+  void setFilter(ClockedInFilter filter) {
     selectedFilter.value = filter;
     _applyFilter();
   }
 
-  Future<void> submitCheckOut(AttendanceRecord record) async {
+  Future<void> submitCheckOut(ClockedInRecord record) async {
     if (isCheckingOut.value) return;
 
     isCheckingOut.value = true;
     await Future.delayed(const Duration(seconds: 1));
+    _removeRecord(record);
     isCheckingOut.value = false;
 
     Get.back();
@@ -50,6 +51,21 @@ class HistoryController extends GetxController {
       margin: const EdgeInsets.all(16),
       duration: const Duration(seconds: 2),
     );
+  }
+
+  void _removeRecord(ClockedInRecord record) {
+    _allGroups = _allGroups
+        .map(
+          (group) => ClockedInDayGroup(
+            title: group.title,
+            subtitle: group.subtitle,
+            records: group.records.where((r) => r.id != record.id).toList(),
+          ),
+        )
+        .where((group) => group.records.isNotEmpty)
+        .toList();
+    _updateStats();
+    _applyFilter();
   }
 
   void _applyFilter() {
@@ -66,15 +82,15 @@ class HistoryController extends GetxController {
               record.checkedInAt.day,
             );
             switch (selectedFilter.value) {
-              case HistoryFilter.today:
+              case ClockedInFilter.today:
                 return day == today;
-              case HistoryFilter.week:
+              case ClockedInFilter.week:
                 return !day.isBefore(weekStart);
-              case HistoryFilter.all:
+              case ClockedInFilter.all:
                 return true;
             }
           }).toList();
-          return HistoryDayGroup(
+          return ClockedInDayGroup(
             title: group.title,
             subtitle: group.subtitle,
             records: filtered,
@@ -108,17 +124,17 @@ class HistoryController extends GetxController {
     weekCount.value = weekTotal;
   }
 
-  List<HistoryDayGroup> _mockHistory() {
+  List<ClockedInDayGroup> _mockClockedIn() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
 
     return [
-      HistoryDayGroup(
+      ClockedInDayGroup(
         title: 'Today',
         subtitle: _formatDate(today),
         records: [
-          AttendanceRecord(
+          ClockedInRecord(
             id: '1',
             employeeName: 'Amina Okello',
             employeeId: 'EMP-1042',
@@ -126,7 +142,7 @@ class HistoryController extends GetxController {
             department: 'Operations',
             checkedInAt: today.add(const Duration(hours: 8, minutes: 12)),
           ),
-          AttendanceRecord(
+          ClockedInRecord(
             id: '2',
             employeeName: 'James Mwangi',
             employeeId: 'EMP-2048',
@@ -134,7 +150,7 @@ class HistoryController extends GetxController {
             department: 'Logistics',
             checkedInAt: today.add(const Duration(hours: 9, minutes: 5)),
           ),
-          AttendanceRecord(
+          ClockedInRecord(
             id: '3',
             employeeName: 'Sarah Njoroge',
             employeeId: 'EMP-3011',
@@ -144,11 +160,11 @@ class HistoryController extends GetxController {
           ),
         ],
       ),
-      HistoryDayGroup(
+      ClockedInDayGroup(
         title: 'Yesterday',
         subtitle: _formatDate(yesterday),
         records: [
-          AttendanceRecord(
+          ClockedInRecord(
             id: '4',
             employeeName: 'David Kimani',
             employeeId: 'EMP-1180',
@@ -156,7 +172,7 @@ class HistoryController extends GetxController {
             department: 'Maintenance',
             checkedInAt: yesterday.add(const Duration(hours: 7, minutes: 55)),
           ),
-          AttendanceRecord(
+          ClockedInRecord(
             id: '5',
             employeeName: 'Grace Wanjiku',
             employeeId: 'EMP-2205',
@@ -166,11 +182,11 @@ class HistoryController extends GetxController {
           ),
         ],
       ),
-      HistoryDayGroup(
+      ClockedInDayGroup(
         title: 'Earlier',
         subtitle: _formatDate(today.subtract(const Duration(days: 3))),
         records: [
-          AttendanceRecord(
+          ClockedInRecord(
             id: '6',
             employeeName: 'Peter Ochieng',
             employeeId: 'EMP-1099',
@@ -185,8 +201,18 @@ class HistoryController extends GetxController {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }

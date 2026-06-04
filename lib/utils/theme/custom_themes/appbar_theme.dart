@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../constants/colors.dart';
 
 class TAppBarTheme {
   TAppBarTheme._();
@@ -20,7 +19,6 @@ class TAppBarTheme {
     ),
   );
 
-
   //app bar dark mode
   static const darkAppBarTheme = AppBarTheme(
     elevation: 0,
@@ -36,5 +34,4 @@ class TAppBarTheme {
       color: Colors.white,
     ),
   );
-
 }

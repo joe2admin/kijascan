@@ -43,14 +43,10 @@ class CheckInSuccessScreen extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: _green.withOpacity(0.12),
+                  color: _green.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.login_rounded,
-                  color: _green,
-                  size: 40,
-                ),
+                child: const Icon(Icons.login_rounded, color: _green, size: 40),
               ),
               const SizedBox(height: 24),
               Text(
@@ -105,10 +101,7 @@ class CheckInSuccessScreen extends StatelessWidget {
                 ),
               ],
               const Spacer(flex: 3),
-              _PrimaryButton(
-                label: 'Scan Another',
-                onTap: _returnToScanner,
-              ),
+              _PrimaryButton(label: 'Scan Another', onTap: _returnToScanner),
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: _returnToScanner,
@@ -142,7 +135,6 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

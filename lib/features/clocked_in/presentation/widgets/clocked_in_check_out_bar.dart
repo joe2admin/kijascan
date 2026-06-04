@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
-class CheckOutBar extends StatelessWidget {
+class ClockedInCheckOutBar extends StatelessWidget {
   final bool isSubmitting;
   final VoidCallback onCheckOut;
 
-  const CheckOutBar({required this.isSubmitting, required this.onCheckOut});
+  const ClockedInCheckOutBar({
+    super.key,
+    required this.isSubmitting,
+    required this.onCheckOut,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
-        color: TColors.white,
+        color: dark ? TColors.dark : TColors.light,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),

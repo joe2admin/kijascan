@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
@@ -24,7 +25,7 @@ class ScannerBottomNavBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: dark ? TColors.textPrimary : TColors.grey,
+            color: dark ? TColors.textPrimary : TColors.darkGrey.withValues(alpha: 0.4),
             blurRadius: TSizes.fontSizeXl,
             offset: const Offset(0, 8),
           ),
@@ -34,15 +35,15 @@ class ScannerBottomNavBar extends StatelessWidget {
         children: [
           Expanded(
             child: _NavItem(
-              icon: Icons.history_rounded,
-              label: 'History',
+              icon: Iconsax.repeat,
+              label: 'Clocked-In',
               isActive: selectedIndex == 0,
               onTap: () => onTabChanged(0),
             ),
           ),
           Expanded(
             child: _NavItem(
-              icon: Icons.qr_code_scanner_rounded,
+              icon: Iconsax.scan,
               label: 'Scan',
               isActive: selectedIndex == 1,
               onTap: () => onTabChanged(1),
@@ -50,8 +51,8 @@ class ScannerBottomNavBar extends StatelessWidget {
           ),
           Expanded(
             child: _NavItem(
-              icon: Icons.people_outline_rounded,
-              label: 'Team',
+              icon: Iconsax.people,
+              label: 'History',
               isActive: selectedIndex == 2,
               onTap: () => onTabChanged(2),
             ),

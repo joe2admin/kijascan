@@ -102,7 +102,7 @@ class _CameraErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: TColors.dark,
+      color: Colors.black,
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),

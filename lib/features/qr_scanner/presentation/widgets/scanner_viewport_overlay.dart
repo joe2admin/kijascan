@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kijascan/utils/constants/colors.dart%20';
+import 'package:kijascan/utils/constants/colors.dart';
 
 /// Dims the camera feed everywhere except the scan window, with corner brackets only.
 class ScannerViewportOverlay extends StatelessWidget {
-  
   final Rect scanWindow;
   final Color cornerColor;
   final double cornerStrokeWidth;
@@ -19,7 +18,6 @@ class ScannerViewportOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return CustomPaint(
       painter: _OverlayPainter(
         scanWindow: scanWindow,
@@ -55,7 +53,10 @@ class _OverlayPainter extends CustomPainter {
     final full = Path()..addRect(Offset.zero & size);
     final cutout = Path()
       ..addRRect(
-        RRect.fromRectAndRadius(scanWindow, const Radius.circular(cornerRadius)),
+        RRect.fromRectAndRadius(
+          scanWindow,
+          const Radius.circular(cornerRadius),
+        ),
       );
     final dim = Path.combine(PathOperation.difference, full, cutout);
 

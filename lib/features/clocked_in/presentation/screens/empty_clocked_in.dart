@@ -3,8 +3,8 @@ import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 
-class EmptyHistory extends StatelessWidget {
-  // const EmptyHistory();
+class EmptyClockedIn extends StatelessWidget {
+  const EmptyClockedIn({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +16,10 @@ class EmptyHistory extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.history_rounded, size: 56, color: TColors.darkGrey),
+            Icon(Icons.login_rounded, size: 56, color: TColors.darkGrey),
             const SizedBox(height: TSizes.defaultSpace),
             Text(
-              'No check-ins yet',
+              'No one clocked in yet',
               style: TextStyle(
                 color: dark ? TColors.light : TColors.dark,
                 fontSize: TSizes.fontSizeMd,
@@ -28,7 +28,7 @@ class EmptyHistory extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Check-ins for this period will appear here.',
+              'Clocked-in people for this period will appear here.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: TColors.darkGrey,

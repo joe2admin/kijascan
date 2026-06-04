@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
-class StatCard extends StatelessWidget {
+class ClockedInStatCard extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
 
-  const StatCard({
+  const ClockedInStatCard({
+    super.key,
     required this.label,
     required this.value,
     required this.icon,
@@ -15,10 +17,11 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: dark ? TColors.darkerGrey : TColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -46,16 +49,16 @@ class StatCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    color: TColors.darkGrey,
+                  style: TextStyle(
+                    color: dark ? TColors.white : TColors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: TColors.black,
+                  style: TextStyle(
+                    color: dark ? TColors.white : TColors.black,
                     fontSize: TSizes.fontSizeLg,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
