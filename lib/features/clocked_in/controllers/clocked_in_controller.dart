@@ -47,7 +47,7 @@ class ClockedInController extends GetxController {
     Get.snackbar(
       'Checked out',
       '${record.employeeName} has been checked out.',
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
       duration: const Duration(seconds: 2),
     );

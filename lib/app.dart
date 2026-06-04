@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/core/theme_controller.dart';
 import 'package:kijascan/routes/app_pages.dart';
+import 'package:kijascan/utils/theme/custom_themes/elevated_button_theme.dart';
 import 'package:kijascan/utils/theme/theme.dart';
 
 class App extends StatelessWidget {
@@ -8,16 +10,21 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'KijaScan',
-      theme: TAppTheme.lightTheme,
-      darkTheme: TAppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
+    // Initialize ThemeController
+    Get.put(ThemeController());
 
-      // GetX Routing Setup
-      initialRoute: AppPages.initial,
-      getPages: AppPages.routes,
-    );
+    return Obx(() {
+      final themeMode = Get.find<ThemeController>().themeMode.value;
+      return GetMaterialApp(
+        title: 'KijaScan',
+        theme: TAppTheme.lightTheme,
+        darkTheme: TAppTheme.darkTheme,
+        themeMode: themeMode,
+        debugShowCheckedModeBanner: false,
+        // GetX Routing Setup
+        initialRoute: AppPages.initial,
+        getPages: AppPages.routes,
+      );
+    });
   }
 }

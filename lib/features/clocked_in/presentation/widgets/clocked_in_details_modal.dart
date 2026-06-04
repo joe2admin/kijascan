@@ -57,8 +57,8 @@ class ClockedInDetailsModal extends GetView<ClockedInController> {
                   ClockedInProfileHeader(record: record),
                   const SizedBox(height: 24),
                   EmployeeTicketCard(
-                    cardColor: Colors.white,
-                    backgroundColor: dark ? TColors.dark : TColors.light,
+                    cardColor: dark? TColors.darkerGrey : TColors.white,
+                    backgroundColor: dark ? TColors.dark : TColors.softGrey,
                     labelColor: dark ? TColors.softGrey : TColors.darkGrey,
                     valueColor: dark ? TColors.light : TColors.dark,
                     headerDate: record.dateLabel,

@@ -35,7 +35,7 @@ class ScannerBottomNavBar extends StatelessWidget {
         children: [
           Expanded(
             child: _NavItem(
-              icon: Iconsax.repeat,
+              icon: Iconsax.people,
               label: 'Clocked-In',
               isActive: selectedIndex == 0,
               onTap: () => onTabChanged(0),
@@ -51,7 +51,7 @@ class ScannerBottomNavBar extends StatelessWidget {
           ),
           Expanded(
             child: _NavItem(
-              icon: Iconsax.people,
+              icon: Iconsax.repeat,
               label: 'History',
               isActive: selectedIndex == 2,
               onTap: () => onTabChanged(2),

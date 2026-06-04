@@ -54,7 +54,9 @@ class CheckInController extends GetxController {
 
   String _formatTimeNow() {
     final now = DateTime.now();
-    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final hour = now.hour > 12
+        ? now.hour - 12
+        : (now.hour == 0 ? 12 : now.hour);
     final minute = now.minute.toString().padLeft(2, '0');
     final period = now.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
@@ -141,7 +143,7 @@ class CheckInController extends GetxController {
     final name = employee.value!.fullName;
 
     isSubmitting.value = false;
-    statusMessage.value = 'Check-in recorded successfully.';
+    statusMessage.value = 'Clock-in recorded successfully.';
 
     Get.offNamedUntil(
       AppRoutes.checkInSuccess,

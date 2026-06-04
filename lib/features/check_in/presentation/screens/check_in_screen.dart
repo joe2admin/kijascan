@@ -26,7 +26,7 @@ class CheckInScreen extends GetView<CheckInController> {
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: dark ? TColors.softGrey: TColors.black,
+              color: dark ? TColors.softGrey : TColors.black,
               size: 20,
             ),
             onPressed: controller.cancel,
@@ -92,9 +92,7 @@ class CheckInScreen extends GetView<CheckInController> {
                         cardColor: dark
                             ? const Color.fromARGB(255, 25, 30, 27)
                             : TColors.white,
-                        backgroundColor: dark
-                            ? TColors.dark
-                            : TColors.softGrey,
+                        backgroundColor: dark ? TColors.dark : TColors.softGrey,
                         labelColor: dark ? TColors.white : TColors.dark,
                         valueColor: dark ? TColors.white : TColors.dark,
                         headerDate: employee.attendanceDate,
@@ -123,7 +121,6 @@ class CheckInScreen extends GetView<CheckInController> {
   }
 }
 
-/// Centered avatar + full name (profile inspiration).
 class _ProfileHeader extends StatelessWidget {
   final ScannedEmployee employee;
   final Color textPrimary;
@@ -270,9 +267,7 @@ class _CheckInBar extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-      decoration: BoxDecoration(
-        color: barBg,
-      ),
+      decoration: BoxDecoration(color: barBg),
       child: SafeArea(
         top: false,
         child: GestureDetector(

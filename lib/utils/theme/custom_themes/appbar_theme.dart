@@ -16,6 +16,7 @@ class TAppBarTheme {
       fontSize: 18,
       fontWeight: FontWeight.w600,
       color: Colors.black,
+      fontFamily: 'Outfit',
     ),
   );
 
@@ -32,6 +33,7 @@ class TAppBarTheme {
       fontSize: 18,
       fontWeight: FontWeight.w600,
       color: Colors.white,
+      fontFamily: 'Outfit',
     ),
   );
 }

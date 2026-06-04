@@ -70,7 +70,7 @@ class ClockedInCheckOutBar extends StatelessWidget {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          'Check Out',
+                          'Clock Out',
                           style: TextStyle(
                             color: TColors.white,
                             fontSize: TSizes.fontSizeMd,

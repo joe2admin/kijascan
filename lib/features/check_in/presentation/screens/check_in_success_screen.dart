@@ -50,7 +50,7 @@ class CheckInSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Checked in',
+                'Clock-In Successful',
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF0F1A12),
                   fontSize: 26,
@@ -68,19 +68,19 @@ class CheckInSuccessScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: isDark ? Colors.white54 : Colors.black45,
-                  fontSize: 14,
-                ),
-              ),
+              // const SizedBox(height: 8),
+                // Text(
+                //   message,
+                //   textAlign: TextAlign.center,
+                //   style: TextStyle(
+                //     color: isDark ? Colors.white54 : Colors.black45,
+                //     fontSize: 14,
+                //   ),
+                // ),
               if (checkedInTime != null) ...[
                 const SizedBox(height: 20),
                 Text(
-                  'Checked-in at $checkedInTime',
+                  'Clocked in at $checkedInTime',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isDark ? Colors.white70 : const Color(0xFF374151),

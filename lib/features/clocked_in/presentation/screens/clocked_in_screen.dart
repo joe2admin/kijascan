@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kijascan/features/clocked_in/presentation/screens/empty_clocked_in.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:kijascan/features/clocked_in/presentation/widgets/empty_clocked_in.dart';
 import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_header.dart';
 import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_stats_row.dart';
 import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_day_section.dart';
 import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_filter_chips.dart';
+import 'package:kijascan/routes/app_routes.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
@@ -20,66 +22,101 @@ class ClockedInScreen extends GetView<ClockedInController> {
     final dark = THelperFunctions.isDarkMode(context);
     return ColoredBox(
       color: dark ? TColors.dark : TColors.light,
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: const ClockedInHeader(),
+      child: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  child: const ClockedInHeader(),
+                ),
+                const SizedBox(height: TSizes.defaultSpace),
+                Obx(
+                  () => ClockedInStatsRow(
+                    todayCount: controller.todayCount.value,
+                    weekCount: controller.weekCount.value,
+                  ),
+                ),
+                const SizedBox(height: TSizes.defaultSpace),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Obx(
+                    () => ClockedInFilterChips(
+                      selected: controller.selectedFilter.value,
+                      onSelected: controller.setFilter,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: TColors.primary,
+                          strokeWidth: 2.5,
+                        ),
+                      );
+                    }
+
+                    if (controller.groups.isEmpty) {
+                      return const EmptyClockedIn();
+                    }
+
+                    return RefreshIndicator(
+                      color: TColors.primary,
+                      onRefresh: controller.loadClockedIn,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+                        itemCount: controller.groups.length,
+                        itemBuilder: (context, index) {
+                          final group = controller.groups[index];
+                          return ClockedInDaySection(group: group);
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
-            const SizedBox(height: TSizes.defaultSpace),
-            Obx(
-              () => ClockedInStatsRow(
-                todayCount: controller.todayCount.value,
-                weekCount: controller.weekCount.value,
-              ),
-            ),
-            const SizedBox(height: TSizes.defaultSpace),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Obx(
-                () => ClockedInFilterChips(
-                  selected: controller.selectedFilter.value,
-                  onSelected: controller.setFilter,
+          ),
+          Positioned(
+            bottom: 24,
+            right: 24,
+            child: Obx(
+              () => FloatingActionButton.extended(
+                onPressed: controller.groups.isEmpty
+                    ? null
+                    : () => _openBulkClockOut(context),
+                backgroundColor: TColors.primary,
+                icon: const Icon(
+                  Iconsax.people,
+                  size: 22,
+                  color: TColors.white,
+                ),
+                label: const Text(
+                  'Bulk\nClock Out',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: TSizes.fontSizeSm,
+                    fontWeight: FontWeight.w600,
+                    color: TColors.white,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: TColors.primary,
-                      strokeWidth: 2.5,
-                    ),
-                  );
-                }
-
-                if (controller.groups.isEmpty) {
-                  return const EmptyClockedIn();
-                }
-
-                return RefreshIndicator(
-                  color: TColors.primary,
-                  onRefresh: controller.loadClockedIn,
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                    itemCount: controller.groups.length,
-                    itemBuilder: (context, index) {
-                      final group = controller.groups[index];
-                      return ClockedInDaySection(group: group);
-                    },
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _openBulkClockOut(BuildContext context) {
+    // Pass all groups to bulk clock out screen
+    Get.toNamed(AppRoutes.bulkClockOut, arguments: controller.groups.toList());
   }
 }
