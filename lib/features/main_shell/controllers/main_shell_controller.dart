@@ -6,17 +6,7 @@ class MainShellController extends GetxController {
   final currentIndex = 1.obs;
 
   void setTab(int index) {
-    if (index == 2) {
-      Get.snackbar(
-        'History',
-        'History view is coming soon.',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
-      );
-      return;
-    }
-
+    if (index < 0 || index > 2) return;
     if (index == currentIndex.value) return;
 
     final leavingScan = currentIndex.value == 1;
@@ -25,7 +15,7 @@ class MainShellController extends GetxController {
     if (!Get.isRegistered<QrScannerController>()) return;
 
     final scanner = Get.find<QrScannerController>();
-    if (leavingScan && index == 0) {
+    if (leavingScan && index != 1) {
       scanner.pauseCamera();
     } else if (index == 1) {
       scanner.resumeCamera();

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_stat_card.dart';
+import 'package:kijascan/features/history/presentation/widgets/history_stat_card.dart';
 
-class ClockedInStatsRow extends StatelessWidget {
+class HistoryStatsRow extends StatelessWidget {
   final int todayCount;
   final int weekCount;
+  final int totalCount;
 
-  const ClockedInStatsRow({
+  const HistoryStatsRow({
     super.key,
     required this.todayCount,
     required this.weekCount,
+    required this.totalCount,
   });
 
   @override
@@ -19,16 +21,16 @@ class ClockedInStatsRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: ClockedInStatCard(
+            child: HistoryStatCard(
               label: 'Today',
               value: '$todayCount',
-              icon: Iconsax.calendar_1,
+              icon: Iconsax.calendar_2,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
-            child: ClockedInStatCard(
-              label: 'This week',
+            child: HistoryStatCard(
+              label: 'Week',
               value: '$weekCount',
               icon: Iconsax.timer_1,
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/features/bottom_nav_bar.dart/presentation/screens/bottom_nav_bar_screen.dart';
 import 'package:kijascan/features/clocked_in/presentation/screens/clocked_in_screen.dart';
+import 'package:kijascan/features/history/presentation/screens/history_screen.dart';
 import 'package:kijascan/features/main_shell/controllers/main_shell_controller.dart';
 import 'package:kijascan/features/qr_scanner/presentation/screens/qr_scanner_screen.dart';
 import 'package:kijascan/utils/constants/colors.dart';
@@ -33,7 +34,11 @@ class MainShellScreen extends GetView<MainShellController> {
               : TColors.light,
           body: IndexedStack(
             index: index,
-            children: const [ClockedInScreen(), QrScannerScreen()],
+            children: const [
+              ClockedInScreen(),
+              QrScannerScreen(),
+              HistoryScreen(),
+            ],
           ),
           bottomNavigationBar: SafeArea(
             top: false,
