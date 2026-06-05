@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/core/services/api_services.dart';
 import '../models/clocked_in_record.dart';
 
 enum ClockedInFilter { all, today, week }
@@ -11,8 +12,10 @@ class ClockedInController extends GetxController {
   final todayCount = 0.obs;
   final weekCount = 0.obs;
   final isCheckingOut = false.obs;
+  final errorMessage = ''.obs;
 
-  List<ClockedInDayGroup> _allGroups = [];
+  final ApiService _apiService = ApiService();
+  List<ClockedInRecord> _allRecords = [];
 
   @override
   void onInit() {
@@ -22,11 +25,20 @@ class ClockedInController extends GetxController {
 
   Future<void> loadClockedIn() async {
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 500));
-    _allGroups = _mockClockedIn();
-    _updateStats();
-    _applyFilter();
-    isLoading.value = false;
+    errorMessage.value = '';
+    try {
+      _allRecords = await _apiService.fetchActiveClockedIn();
+      _updateStats();
+      _applyFilter();
+    } catch (e) {
+      errorMessage.value = 'Failed to load clocked-in data.';
+      _allRecords = [];
+      groups.clear();
+      todayCount.value = 0;
+      weekCount.value = 0;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void setFilter(ClockedInFilter filter) {
@@ -38,34 +50,35 @@ class ClockedInController extends GetxController {
     if (isCheckingOut.value) return;
 
     isCheckingOut.value = true;
-    await Future.delayed(const Duration(seconds: 1));
-    _removeRecord(record);
+
+    final success = await _apiService.submitClockOut(record.id);
+
+    if (success) {
+      // Remove from local list and refresh
+      _allRecords = _allRecords.where((r) => r.id != record.id).toList();
+      _updateStats();
+      _applyFilter();
+
+      Get.back();
+
+      Get.snackbar(
+        'Checked out',
+        '${record.employeeName} has been checked out.',
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'Failed to clock out ${record.employeeName}. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    }
+
     isCheckingOut.value = false;
-
-    Get.back();
-
-    Get.snackbar(
-      'Checked out',
-      '${record.employeeName} has been checked out.',
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 2),
-    );
-  }
-
-  void _removeRecord(ClockedInRecord record) {
-    _allGroups = _allGroups
-        .map(
-          (group) => ClockedInDayGroup(
-            title: group.title,
-            subtitle: group.subtitle,
-            records: group.records.where((r) => r.id != record.id).toList(),
-          ),
-        )
-        .where((group) => group.records.isNotEmpty)
-        .toList();
-    _updateStats();
-    _applyFilter();
   }
 
   void _applyFilter() {
@@ -73,31 +86,57 @@ class ClockedInController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
     final weekStart = today.subtract(Duration(days: today.weekday - 1));
 
-    groups.value = _allGroups
-        .map((group) {
-          final filtered = group.records.where((record) {
-            final day = DateTime(
-              record.checkedInAt.year,
-              record.checkedInAt.month,
-              record.checkedInAt.day,
-            );
-            switch (selectedFilter.value) {
-              case ClockedInFilter.today:
-                return day == today;
-              case ClockedInFilter.week:
-                return !day.isBefore(weekStart);
-              case ClockedInFilter.all:
-                return true;
-            }
-          }).toList();
-          return ClockedInDayGroup(
-            title: group.title,
-            subtitle: group.subtitle,
-            records: filtered,
-          );
-        })
-        .where((g) => g.records.isNotEmpty)
-        .toList();
+    final filtered = _allRecords.where((record) {
+      final day = DateTime(
+        record.checkedInAt.year,
+        record.checkedInAt.month,
+        record.checkedInAt.day,
+      );
+      switch (selectedFilter.value) {
+        case ClockedInFilter.today:
+          return day == today;
+        case ClockedInFilter.week:
+          return !day.isBefore(weekStart);
+        case ClockedInFilter.all:
+          return true;
+      }
+    }).toList();
+
+    groups.value = _groupRecords(filtered);
+  }
+
+  List<ClockedInDayGroup> _groupRecords(List<ClockedInRecord> records) {
+    final sorted = [...records]
+      ..sort((a, b) => b.checkedInAt.compareTo(a.checkedInAt));
+
+    final byDay = <DateTime, List<ClockedInRecord>>{};
+    for (final record in sorted) {
+      final day = DateTime(
+        record.checkedInAt.year,
+        record.checkedInAt.month,
+        record.checkedInAt.day,
+      );
+      byDay.putIfAbsent(day, () => []).add(record);
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    return byDay.entries.map((entry) {
+      final day = entry.key;
+      return ClockedInDayGroup(
+        title: _dayTitle(day, today, yesterday),
+        subtitle: _formatDate(day),
+        records: entry.value,
+      );
+    }).toList();
+  }
+
+  String _dayTitle(DateTime day, DateTime today, DateTime yesterday) {
+    if (day == today) return 'Today';
+    if (day == yesterday) return 'Yesterday';
+    return 'Earlier';
   }
 
   void _updateStats() {
@@ -108,95 +147,18 @@ class ClockedInController extends GetxController {
     var todayTotal = 0;
     var weekTotal = 0;
 
-    for (final group in _allGroups) {
-      for (final record in group.records) {
-        final day = DateTime(
-          record.checkedInAt.year,
-          record.checkedInAt.month,
-          record.checkedInAt.day,
-        );
-        if (day == today) todayTotal++;
-        if (!day.isBefore(weekStart)) weekTotal++;
-      }
+    for (final record in _allRecords) {
+      final day = DateTime(
+        record.checkedInAt.year,
+        record.checkedInAt.month,
+        record.checkedInAt.day,
+      );
+      if (day == today) todayTotal++;
+      if (!day.isBefore(weekStart)) weekTotal++;
     }
 
     todayCount.value = todayTotal;
     weekCount.value = weekTotal;
-  }
-
-  List<ClockedInDayGroup> _mockClockedIn() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    return [
-      ClockedInDayGroup(
-        title: 'Today',
-        subtitle: _formatDate(today),
-        records: [
-          ClockedInRecord(
-            id: '1',
-            employeeName: 'Amina Okello',
-            employeeId: 'EMP-1042',
-            role: 'Field Officer',
-            department: 'Operations',
-            checkedInAt: today.add(const Duration(hours: 8, minutes: 12)),
-          ),
-          ClockedInRecord(
-            id: '2',
-            employeeName: 'James Mwangi',
-            employeeId: 'EMP-2048',
-            role: 'Supervisor',
-            department: 'Logistics',
-            checkedInAt: today.add(const Duration(hours: 9, minutes: 5)),
-          ),
-          ClockedInRecord(
-            id: '3',
-            employeeName: 'Sarah Njoroge',
-            employeeId: 'EMP-3011',
-            role: 'Analyst',
-            department: 'Finance',
-            checkedInAt: today.add(const Duration(hours: 10, minutes: 42)),
-          ),
-        ],
-      ),
-      ClockedInDayGroup(
-        title: 'Yesterday',
-        subtitle: _formatDate(yesterday),
-        records: [
-          ClockedInRecord(
-            id: '4',
-            employeeName: 'David Kimani',
-            employeeId: 'EMP-1180',
-            role: 'Technician',
-            department: 'Maintenance',
-            checkedInAt: yesterday.add(const Duration(hours: 7, minutes: 55)),
-          ),
-          ClockedInRecord(
-            id: '5',
-            employeeName: 'Grace Wanjiku',
-            employeeId: 'EMP-2205',
-            role: 'Coordinator',
-            department: 'HR',
-            checkedInAt: yesterday.add(const Duration(hours: 14, minutes: 20)),
-          ),
-        ],
-      ),
-      ClockedInDayGroup(
-        title: 'Earlier',
-        subtitle: _formatDate(today.subtract(const Duration(days: 3))),
-        records: [
-          ClockedInRecord(
-            id: '6',
-            employeeName: 'Peter Ochieng',
-            employeeId: 'EMP-1099',
-            role: 'Driver',
-            department: 'Transport',
-            checkedInAt: today.subtract(const Duration(days: 3, hours: -8)),
-          ),
-        ],
-      ),
-    ];
   }
 
   String _formatDate(DateTime date) {

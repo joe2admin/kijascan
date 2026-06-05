@@ -21,14 +21,19 @@ class ScannedEmployee {
 
   factory ScannedEmployee.fromJson(Map<String, dynamic> json) {
     return ScannedEmployee(
-      id: json['id'] ?? '',
-      fullName: json['full_name'] ?? '',
-      role: json['position'] ?? '',
-      department: json['department'] ?? '',
-      attendanceDate: json['attendance_date'] ?? '',
-      imageUrl: json['profile_picture'],
-      checkedInTime: json['clock_in'],
-      isCurrentlyCheckedIn: json['is_currently_checked_in'] ?? false,
+      // The ?.toString() safely converts numbers like 1 to "1"
+      id: json['id']?.toString() ?? '',
+      fullName: json['full_name']?.toString() ?? '',
+      role: json['position']?.toString() ?? '',
+      department: json['department']?.toString() ?? '',
+      attendanceDate: json['attendance_date']?.toString() ?? '',
+      imageUrl: json['profile_picture']?.toString(),
+      checkedInTime: json['clock_in']?.toString(),
+
+      // For boolean, if Laravel returns 0 or 1, we can handle it like this:
+      isCurrentlyCheckedIn:
+          json['is_currently_checked_in'] == true ||
+          json['is_currently_checked_in'] == 1,
     );
   }
 

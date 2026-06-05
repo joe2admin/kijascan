@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
@@ -247,7 +248,7 @@ class _SelectAllCheckbox extends StatelessWidget {
 }
 
 class _EmployeeListTile extends StatelessWidget {
-  final dynamic employee;
+  final ClockedInRecord employee;
   final bool isSelected;
   final VoidCallback onTap;
   final bool dark;

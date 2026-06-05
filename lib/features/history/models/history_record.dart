@@ -17,6 +17,21 @@ class HistoryRecord {
     required this.checkedOutAt,
   });
 
+  /// Parse from the /api/v1/clock/history JSON response item.
+  factory HistoryRecord.fromJson(Map<String, dynamic> json) {
+    return HistoryRecord(
+      id: json['id']?.toString() ?? '',
+      employeeName: json['full_name']?.toString() ?? '',
+      employeeId: json['employee_id_number']?.toString() ?? '',
+      role: json['position']?.toString() ?? '',
+      department: json['department']?.toString(),
+      checkedInAt: DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
+          DateTime.now(),
+      checkedOutAt: DateTime.tryParse(json['clock_out']?.toString() ?? '') ??
+          DateTime.now(),
+    );
+  }
+
   String get departmentLabel {
     final value = department?.trim();
     if (value == null || value.isEmpty) return '-';

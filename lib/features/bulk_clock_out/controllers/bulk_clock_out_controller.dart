@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijascan/core/services/api_services.dart';
+import 'package:kijascan/features/clocked_in/controllers/clocked_in_controller.dart';
 import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
 
 class BulkClockOutController extends GetxController {
   final isLoading = true.obs;
   final isProcessing = false.obs;
-  final employees = <dynamic>[].obs;
+  final employees = <ClockedInRecord>[].obs;
   final selectedIds = <String>{}.obs;
   final selectAll = false.obs;
 
-  List<ClockedInDayGroup> _allGroups = [];
+  final ApiService _apiService = ApiService();
 
   @override
   void onInit() {
     super.onInit();
     final args = Get.arguments as List?;
     if (args != null && args.isNotEmpty) {
-      _allGroups = List<ClockedInDayGroup>.from(args);
+      final allGroups = List<ClockedInDayGroup>.from(args);
+      _loadFromGroups(allGroups);
+    } else {
+      _loadFromApi();
     }
-    _loadEmployees();
   }
 
-  Future<void> _loadEmployees() async {
+  void _loadFromGroups(List<ClockedInDayGroup> allGroups) {
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // Flatten all records from all day groups
-    final allEmployees = <dynamic>[];
-    for (final group in _allGroups) {
+    final allEmployees = <ClockedInRecord>[];
+    for (final group in allGroups) {
       allEmployees.addAll(group.records);
     }
-
     employees.value = allEmployees;
     isLoading.value = false;
+  }
+
+  Future<void> _loadFromApi() async {
+    isLoading.value = true;
+    try {
+      employees.value = await _apiService.fetchActiveClockedIn();
+    } catch (e) {
+      employees.clear();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void toggleSelection(String id) {
@@ -49,7 +60,7 @@ class BulkClockOutController extends GetxController {
     selectAll.value = value;
     selectedIds.clear();
     if (value) {
-      selectedIds.addAll(employees.map((e) => _getId(e)));
+      selectedIds.addAll(employees.map((e) => e.id));
     }
     selectedIds.refresh();
   }
@@ -57,13 +68,6 @@ class BulkClockOutController extends GetxController {
   void _updateSelectAllState() {
     selectAll.value =
         selectedIds.length == employees.length && employees.isNotEmpty;
-  }
-
-  String _getId(dynamic employee) {
-    if (employee is ClockedInRecord) {
-      return employee.id;
-    }
-    return employee.id as String;
   }
 
   bool isSelected(String id) => selectedIds.contains(id);
@@ -76,22 +80,35 @@ class BulkClockOutController extends GetxController {
     if (isProcessing.value || !hasSelection) return;
 
     isProcessing.value = true;
-    await Future.delayed(const Duration(seconds: 1));
 
-    final selectedEmployees = employees
-        .where((e) => selectedIds.contains(_getId(e)))
-        .toList();
+    final success =
+        await _apiService.submitBulkClockOut(selectedIds.toList());
 
     isProcessing.value = false;
 
-    Get.back();
-    Get.snackbar(
-      'Bulk Clock Out Complete',
-      '${selectedEmployees.length} employee(s) have been checked out.',
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 2),
-    );
+    if (success) {
+      // Refresh the clocked-in list
+      if (Get.isRegistered<ClockedInController>()) {
+        Get.find<ClockedInController>().loadClockedIn();
+      }
+
+      Get.back();
+      Get.snackbar(
+        'Bulk Clock Out Complete',
+        '${selectedIds.length} employee(s) have been checked out.',
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'Failed to clock out employees. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 
   void cancel() {

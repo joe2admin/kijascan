@@ -15,6 +15,19 @@ class ClockedInRecord {
     required this.checkedInAt,
   });
 
+  /// Parse from the /api/v1/clock/active JSON response item.
+  factory ClockedInRecord.fromJson(Map<String, dynamic> json) {
+    return ClockedInRecord(
+      id: json['employee_id']?.toString() ?? '',
+      employeeName: json['full_name']?.toString() ?? '',
+      employeeId: json['employee_id_number']?.toString() ?? '',
+      role: json['position']?.toString() ?? '',
+      department: json['department']?.toString(),
+      checkedInAt: DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
+          DateTime.now(),
+    );
+  }
+
   String get departmentLabel {
     final value = department?.trim();
     if (value == null || value.isEmpty) return '-';

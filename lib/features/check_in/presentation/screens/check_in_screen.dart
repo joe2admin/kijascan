@@ -65,12 +65,16 @@ class CheckInScreen extends GetView<CheckInController> {
             );
           }
 
-          final employee = controller.employee.value;
+                    final employee = controller.employee.value;
           if (employee == null) {
             return Center(
-              child: Text(
-                'Could not load employee details.',
-                style: TextStyle(color: TColors.darkGrey),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  'Error: ${controller.statusMessage.value}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red, fontSize: 16),
+                ),
               ),
             );
           }
@@ -259,7 +263,7 @@ class _CheckInBar extends StatelessWidget {
     required this.isDark,
   });
 
-  static const Color _green = Color(0xFF22C55E);
+  static const Color _green = TColors.primary;
 
   @override
   Widget build(BuildContext context) {

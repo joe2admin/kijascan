@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:kijascan/core/services/api_services.dart';
 import '../models/history_record.dart';
 
 enum HistoryFilter { all, today, week }
@@ -10,9 +11,10 @@ class HistoryController extends GetxController {
   final todayCount = 0.obs;
   final weekCount = 0.obs;
   final totalCount = 0.obs;
+  final errorMessage = ''.obs;
 
-  final List<HistoryRecord> _records = [];
-  bool _didLoadInitialMock = false;
+  final ApiService _apiService = ApiService();
+  List<HistoryRecord> _records = [];
 
   @override
   void onInit() {
@@ -22,15 +24,20 @@ class HistoryController extends GetxController {
 
   Future<void> loadHistory() async {
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 450));
-
-    if (!_didLoadInitialMock) {
-      _records.addAll(_mockHistory());
-      _didLoadInitialMock = true;
+    errorMessage.value = '';
+    try {
+      _records = await _apiService.fetchHistory();
+      _refreshView();
+    } catch (e) {
+      errorMessage.value = 'Failed to load history.';
+      _records = [];
+      groups.clear();
+      todayCount.value = 0;
+      weekCount.value = 0;
+      totalCount.value = 0;
+    } finally {
+      isLoading.value = false;
     }
-
-    _refreshView();
-    isLoading.value = false;
   }
 
   void setFilter(HistoryFilter filter) {
@@ -133,52 +140,6 @@ class HistoryController extends GetxController {
     if (day == today) return 'Today';
     if (day == yesterday) return 'Yesterday';
     return 'Earlier';
-  }
-
-  List<HistoryRecord> _mockHistory() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final earlier = today.subtract(const Duration(days: 4));
-
-    return [
-      HistoryRecord(
-        id: 'hist-1',
-        employeeName: 'Mercy Wairimu',
-        employeeId: 'EMP-4108',
-        role: 'Procurement Officer',
-        department: 'Administration',
-        checkedInAt: today.add(const Duration(hours: 7, minutes: 48)),
-        checkedOutAt: today.add(const Duration(hours: 16, minutes: 12)),
-      ),
-      HistoryRecord(
-        id: 'hist-2',
-        employeeName: 'Brian Otieno',
-        employeeId: 'EMP-3310',
-        role: 'Security Lead',
-        department: 'Facilities',
-        checkedInAt: today.add(const Duration(hours: 6, minutes: 30)),
-        checkedOutAt: today.add(const Duration(hours: 15, minutes: 45)),
-      ),
-      HistoryRecord(
-        id: 'hist-3',
-        employeeName: 'Esther Chebet',
-        employeeId: 'EMP-2704',
-        role: 'Accountant',
-        department: 'Finance',
-        checkedInAt: yesterday.add(const Duration(hours: 8, minutes: 5)),
-        checkedOutAt: yesterday.add(const Duration(hours: 17, minutes: 1)),
-      ),
-      HistoryRecord(
-        id: 'hist-4',
-        employeeName: 'Samuel Kariuki',
-        employeeId: 'EMP-1906',
-        role: 'Operations Assistant',
-        department: 'Operations',
-        checkedInAt: earlier.add(const Duration(hours: 9, minutes: 15)),
-        checkedOutAt: earlier.add(const Duration(hours: 18, minutes: 6)),
-      ),
-    ];
   }
 
   String _formatDate(DateTime date) {
