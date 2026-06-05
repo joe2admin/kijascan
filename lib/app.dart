@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/core/theme_controller.dart';
 import 'package:kijascan/routes/app_pages.dart';
-import 'package:kijascan/utils/theme/custom_themes/elevated_button_theme.dart';
 import 'package:kijascan/utils/theme/theme.dart';
 
 class App extends StatelessWidget {

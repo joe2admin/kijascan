@@ -19,6 +19,19 @@ class ScannedEmployee {
     this.isCurrentlyCheckedIn = false,
   });
 
+  factory ScannedEmployee.fromJson(Map<String, dynamic> json) {
+    return ScannedEmployee(
+      id: json['id'] ?? '',
+      fullName: json['full_name'] ?? '',
+      role: json['position'] ?? '',
+      department: json['department'] ?? '',
+      attendanceDate: json['attendance_date'] ?? '',
+      imageUrl: json['profile_picture'],
+      checkedInTime: json['clock_in'],
+      isCurrentlyCheckedIn: json['is_currently_checked_in'] ?? false,
+    );
+  }
+
   String get checkedInTimeDisplay =>
       checkedInTime?.isNotEmpty == true ? checkedInTime! : '—';
 }

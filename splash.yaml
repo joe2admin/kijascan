@@ -1,0 +1,20 @@
+flutter_native_splash:
+  color: "#ffffff"
+  color_dark: "#272727"
+  image: assets/images/kijascan_logo_black.png
+  image_dark: assets/images/kijascan_logo_white.png
+
+  web: false
+  android: true
+
+  android_12:
+    color: "#ffffff"
+    color_dark: "#000000"
+    image: assets/images/kijascan_logo_black.png
+
+    image_dark: assets/images/kijascan_logo_white.png
+
+
+  
+
+  

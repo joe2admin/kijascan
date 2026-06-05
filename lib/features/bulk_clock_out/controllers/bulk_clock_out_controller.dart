@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
-import 'package:kijascan/routes/app_routes.dart';
 
 class BulkClockOutController extends GetxController {
   final isLoading = true.obs;
@@ -43,15 +42,16 @@ class BulkClockOutController extends GetxController {
       selectedIds.add(id);
     }
     _updateSelectAllState();
+    selectedIds.refresh();
   }
 
   void toggleSelectAll(bool value) {
     selectAll.value = value;
+    selectedIds.clear();
     if (value) {
-      selectedIds.value = employees.map((e) => _getId(e)).toSet();
-    } else {
-      selectedIds.clear();
+      selectedIds.addAll(employees.map((e) => _getId(e)));
     }
+    selectedIds.refresh();
   }
 
   void _updateSelectAllState() {

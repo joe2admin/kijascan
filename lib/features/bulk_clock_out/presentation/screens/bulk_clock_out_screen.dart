@@ -122,12 +122,15 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
                 itemCount: controller.employees.length,
                 itemBuilder: (context, index) {
                   final employee = controller.employees[index];
-                  return _EmployeeListTile(
-                    employee: employee,
-                    isSelected: controller.isSelected(employee.id),
-                    onTap: () => controller.toggleSelection(employee.id),
-                    dark: dark,
-                  );
+                  return Obx(() {
+                    final isSelected = controller.isSelected(employee.id);
+                    return _EmployeeListTile(
+                      employee: employee,
+                      isSelected: isSelected,
+                      onTap: () => controller.toggleSelection(employee.id),
+                      dark: dark,
+                    );
+                  });
                 },
               ),
             ),
@@ -138,37 +141,61 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           child: Obx(
-            () => SizedBox(
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed:
-                    controller.isProcessing.value || !controller.hasSelection
-                    ? null
-                    : controller.submitBulkClockOut,
-                icon: controller.isProcessing.value
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 0,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+            () {
+              final isButtonDisabled = controller.isProcessing.value || !controller.hasSelection;
+              return SizedBox(
+                height: 56,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TColors.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: dark
+                        ? const Color(0xFF2C3530)
+                        : const Color(0xFFE5E7EB),
+                    disabledForegroundColor: dark
+                        ? Colors.white24
+                        : Colors.black26,
+                    elevation: 0,
+                    shadowColor: TColors.primary.withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: isButtonDisabled
+                      ? null
+                      : controller.submitBulkClockOut,
+                  icon: controller.isProcessing.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
+                        )
+                      : Icon(
+                          Iconsax.logout,
+                          size: 20,
+                          color: isButtonDisabled
+                              ? (dark ? Colors.white24 : Colors.black26)
+                              : Colors.white,
                         ),
-                      )
-                    : const Icon(Iconsax.logout, size: 20),
-                label: Text(
-                  controller.isProcessing.value
-                      ? 'Clocking out…'
-                      : 'Clock Out ${controller.selectedCount > 0 ? '(${controller.selectedCount})' : ''}',
-                  style: const TextStyle(
-                    fontSize: TSizes.fontSizeMd,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                  label: Text(
+                    controller.isProcessing.value
+                        ? 'Clocking out…'
+                        : 'Clock Out ${controller.selectedCount > 0 ? '(${controller.selectedCount})' : ''}',
+                    style: const TextStyle(
+                      fontSize: TSizes.fontSizeMd,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Outfit',
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

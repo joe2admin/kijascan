@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/features/qr_scanner/controllers/qr_scanner_controller.dart';
 
