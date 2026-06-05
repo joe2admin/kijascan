@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/routes/app_routes.dart';
 import '../models/scanned_employee.dart';
 
+final ApiService _apiService = ApiService();
 class CheckInController extends GetxController {
   final isLoadingEmployee = true.obs;
   final isSubmitting = false.obs;
@@ -18,11 +20,16 @@ class CheckInController extends GetxController {
   }
 
   Future<void> _loadEmployee() async {
-    isLoadingEmployee.value = true;
-    await Future.delayed(const Duration(milliseconds: 800));
-    employee.value = _resolveEmployee(_qrPayload);
+  isLoadingEmployee.value = true;
+  try {
+    // Call the API service instead of resolving mock data locally
+    employee.value = await _apiService.fetchEmployee(_qrPayload);
+  } catch (e) {
+    statusMessage.value = e.toString();
+  } finally {
     isLoadingEmployee.value = false;
   }
+}
 
   String _formatToday() {
     final now = DateTime.now();
