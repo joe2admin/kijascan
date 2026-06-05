@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
+import 'package:kijascan/utils/widgets/employee_avatar.dart';
 
 class ClockedInProfileHeader extends StatelessWidget {
   final ClockedInRecord record;
@@ -11,18 +12,12 @@ class ClockedInProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
-    final initials = _initials(record.employeeName);
 
     return Column(
       children: [
         Container(
-          width: 96,
-          height: 96,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4ADE80), Color(0xFF16A34A)],
-            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
@@ -31,14 +26,11 @@ class ClockedInProfileHeader extends StatelessWidget {
               ),
             ],
           ),
-          alignment: Alignment.center,
-          child: Text(
-            initials,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-            ),
+          child: EmployeeAvatar(
+            name: record.employeeName,
+            imageUrl: record.profilePictureUrl,
+            size: 96,
+            fontSize: 32,
           ),
         ),
         const SizedBox(height: 14),
@@ -63,19 +55,5 @@ class ClockedInProfileHeader extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      return parts.first.substring(0, 1).toUpperCase();
-    }
-    return '${parts[0].substring(0, 1)}${parts[1].substring(0, 1)}'
-        .toUpperCase();
   }
 }

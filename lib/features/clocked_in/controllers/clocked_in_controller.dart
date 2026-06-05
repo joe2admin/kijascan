@@ -27,10 +27,19 @@ class ClockedInController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
     try {
+      print('ClockedInController - Starting to load clocked-in data...');
       _allRecords = await _apiService.fetchActiveClockedIn();
+      print('ClockedInController - Loaded ${_allRecords.length} records');
       _updateStats();
       _applyFilter();
+      print('ClockedInController - Groups after filter: ${groups.length}');
+      if (groups.isNotEmpty) {
+        print(
+          'ClockedInController - First group has ${groups[0].records.length} records',
+        );
+      }
     } catch (e) {
+      print('ClockedInController - Error loading: $e');
       errorMessage.value = 'Failed to load clocked-in data.';
       _allRecords = [];
       groups.clear();
@@ -86,15 +95,25 @@ class ClockedInController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
     final weekStart = today.subtract(Duration(days: today.weekday - 1));
 
+    print(
+      '_applyFilter - Filter: ${selectedFilter.value}, Total records: ${_allRecords.length}',
+    );
+    print('_applyFilter - Today: $today');
+
     final filtered = _allRecords.where((record) {
       final day = DateTime(
         record.checkedInAt.year,
         record.checkedInAt.month,
         record.checkedInAt.day,
       );
+      print(
+        '_applyFilter - Record day: $day, checkedInAt: ${record.checkedInAt}',
+      );
       switch (selectedFilter.value) {
         case ClockedInFilter.today:
-          return day == today;
+          final match = day == today;
+          print('_applyFilter - Today filter, day == today: $match');
+          return match;
         case ClockedInFilter.week:
           return !day.isBefore(weekStart);
         case ClockedInFilter.all:
@@ -102,6 +121,7 @@ class ClockedInController extends GetxController {
       }
     }).toList();
 
+    print('_applyFilter - Filtered records: ${filtered.length}');
     groups.value = _groupRecords(filtered);
   }
 

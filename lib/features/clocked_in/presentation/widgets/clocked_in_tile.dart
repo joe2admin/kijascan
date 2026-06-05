@@ -4,6 +4,7 @@ import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_det
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
+import 'package:kijascan/utils/widgets/employee_avatar.dart';
 
 class ClockedInTile extends StatelessWidget {
   final ClockedInRecord record;
@@ -13,7 +14,6 @@ class ClockedInTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
-    final initials = _initials(record.employeeName);
 
     return GestureDetector(
       onTap: () => ClockedInDetailsModal.show(record),
@@ -33,23 +33,13 @@ class ClockedInTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [TColors.primary, TColors.accent],
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: TSizes.fontSizeMd,
-                  fontWeight: FontWeight.w700,
-                ),
+            EmployeeAvatar(
+              name: record.employeeName,
+              imageUrl: record.profilePictureUrl,
+              size: 48,
+              borderRadius: 14,
+              gradient: const LinearGradient(
+                colors: [TColors.primary, TColors.accent],
               ),
             ),
             const SizedBox(width: 14),
@@ -126,19 +116,5 @@ class ClockedInTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      return parts.first.substring(0, 1).toUpperCase();
-    }
-    return '${parts[0].substring(0, 1)}${parts[1].substring(0, 1)}'
-        .toUpperCase();
   }
 }

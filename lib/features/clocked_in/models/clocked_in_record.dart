@@ -1,3 +1,5 @@
+import 'package:kijascan/core/services/api_services.dart';
+
 class ClockedInRecord {
   final String id;
   final String employeeName;
@@ -5,6 +7,7 @@ class ClockedInRecord {
   final String role;
   final String? department;
   final DateTime checkedInAt;
+  final String? profilePictureUrl;
 
   const ClockedInRecord({
     required this.id,
@@ -13,6 +16,7 @@ class ClockedInRecord {
     required this.role,
     this.department,
     required this.checkedInAt,
+    this.profilePictureUrl,
   });
 
   /// Parse from the /api/v1/clock/active JSON response item.
@@ -23,8 +27,10 @@ class ClockedInRecord {
       employeeId: json['employee_id_number']?.toString() ?? '',
       role: json['position']?.toString() ?? '',
       department: json['department']?.toString(),
-      checkedInAt: DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
+      checkedInAt:
+          DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
           DateTime.now(),
+      profilePictureUrl: ApiService.resolveImageUrl(json['profile_picture']?.toString()),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:kijascan/features/history/models/history_record.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
+import 'package:kijascan/utils/widgets/employee_avatar.dart';
 
 class HistoryTile extends StatelessWidget {
   final HistoryRecord record;
@@ -12,7 +13,6 @@ class HistoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
-    final initials = _initials(record.employeeName);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -29,22 +29,13 @@ class HistoryTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: TColors.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              initials,
-              style: const TextStyle(
-                color: TColors.primary,
-                fontSize: TSizes.fontSizeMd,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+          EmployeeAvatar(
+            name: record.employeeName,
+            imageUrl: record.profilePictureUrl,
+            size: 48,
+            borderRadius: 14,
+            fallbackColor: TColors.primary.withValues(alpha: 0.12),
+            gradient: null,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -99,11 +90,7 @@ class HistoryTile extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.logout_rounded,
-                      size: 12,
-                      color: TColors.error,
-                    ),
+                    Icon(Icons.logout_rounded, size: 12, color: TColors.error),
                     SizedBox(width: 4),
                     Text(
                       'Out',
@@ -130,17 +117,5 @@ class HistoryTile extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return '${parts[0].substring(0, 1)}${parts[1].substring(0, 1)}'
-        .toUpperCase();
   }
 }

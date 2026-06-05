@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:kijascan/utils/helpers/helper_functions.dart';
+import 'package:kijascan/utils/widgets/employee_avatar.dart';
 import '../../controllers/check_in_controller.dart';
 import '../../models/scanned_employee.dart';
 import '../widgets/employee_ticket_card.dart';
@@ -65,7 +66,7 @@ class CheckInScreen extends GetView<CheckInController> {
             );
           }
 
-                    final employee = controller.employee.value;
+          final employee = controller.employee.value;
           if (employee == null) {
             return Center(
               child: Padding(
@@ -140,10 +141,23 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _EmployeeAvatar(
-          name: employee.fullName,
-          imageUrl: employee.imageUrl,
-          isDark: isDark,
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.1),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: EmployeeAvatar(
+            name: employee.fullName,
+            imageUrl: employee.imageUrl,
+            size: 112,
+            fontSize: 36,
+          ),
         ),
         const SizedBox(height: 16),
         Text(
@@ -169,86 +183,6 @@ class _ProfileHeader extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _EmployeeAvatar extends StatelessWidget {
-  final String name;
-  final String? imageUrl;
-  final bool isDark;
-
-  const _EmployeeAvatar({
-    required this.name,
-    required this.imageUrl,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const size = 112.0;
-    final initials = _initials(name);
-
-    Widget child;
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      child = ClipOval(
-        child: Image.network(
-          imageUrl!,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _initialsAvatar(initials, size),
-        ),
-      );
-    } else {
-      child = _initialsAvatar(initials, size);
-    }
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.1),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _initialsAvatar(String initials, double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF4ADE80), Color(0xFF16A34A)],
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        initials,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 36,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return '${parts.first[0]}${parts.elementAt(1)[0]}'.toUpperCase();
   }
 }
 

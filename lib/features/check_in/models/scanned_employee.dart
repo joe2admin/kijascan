@@ -1,3 +1,5 @@
+import 'package:kijascan/core/services/api_services.dart';
+
 class ScannedEmployee {
   final String id;
   final String fullName;
@@ -27,7 +29,7 @@ class ScannedEmployee {
       role: json['position']?.toString() ?? '',
       department: json['department']?.toString() ?? '',
       attendanceDate: json['attendance_date']?.toString() ?? '',
-      imageUrl: json['profile_picture']?.toString(),
+      imageUrl: ApiService.resolveImageUrl(json['profile_picture']?.toString()),
       checkedInTime: json['clock_in']?.toString(),
 
       // For boolean, if Laravel returns 0 or 1, we can handle it like this:

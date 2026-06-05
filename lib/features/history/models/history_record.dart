@@ -1,3 +1,5 @@
+import 'package:kijascan/core/services/api_services.dart';
+
 class HistoryRecord {
   final String id;
   final String employeeName;
@@ -6,6 +8,7 @@ class HistoryRecord {
   final String? department;
   final DateTime checkedInAt;
   final DateTime checkedOutAt;
+  final String? profilePictureUrl;
 
   const HistoryRecord({
     required this.id,
@@ -15,6 +18,7 @@ class HistoryRecord {
     this.department,
     required this.checkedInAt,
     required this.checkedOutAt,
+    this.profilePictureUrl,
   });
 
   /// Parse from the /api/v1/clock/history JSON response item.
@@ -25,10 +29,13 @@ class HistoryRecord {
       employeeId: json['employee_id_number']?.toString() ?? '',
       role: json['position']?.toString() ?? '',
       department: json['department']?.toString(),
-      checkedInAt: DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
+      checkedInAt:
+          DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
           DateTime.now(),
-      checkedOutAt: DateTime.tryParse(json['clock_out']?.toString() ?? '') ??
+      checkedOutAt:
+          DateTime.tryParse(json['clock_out']?.toString() ?? '') ??
           DateTime.now(),
+      profilePictureUrl: ApiService.resolveImageUrl(json['profile_picture']?.toString()),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -80,6 +81,19 @@ class QrScannerScreen extends GetView<QrScannerController> {
                   child: _ScanHint(),
                 ),
               ],
+            ),
+          ),
+          // Manual entry FAB — bottom right, above nav bar
+          Positioned(
+            bottom: 24,
+            right: 24,
+            child: SafeArea(
+              top: false,
+              child: _GlassIconButton(
+                icon: Iconsax.keyboard,
+                onTap: () => _ManualEntryModal.show(controller),
+                tooltip: 'Enter ID manually',
+              ),
             ),
           ),
         ],
@@ -207,23 +221,31 @@ class _TopBar extends StatelessWidget {
 class _GlassIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
+  final String? tooltip;
 
-  const _GlassIconButton({required this.icon, required this.onTap});
+  const _GlassIconButton({
+    required this.icon,
+    required this.onTap,
+    this.tooltip,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.14),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+    return Tooltip(
+      message: tooltip ?? '',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.14),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          ),
+          child: Icon(icon, color: Colors.white, size: 22),
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
       ),
     );
   }
@@ -247,8 +269,8 @@ class _ScanHint extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: TSizes.xs*2,
-            height: TSizes.xs*2,
+            width: TSizes.xs * 2,
+            height: TSizes.xs * 2,
             decoration: const BoxDecoration(
               color: TColors.primary,
               shape: BoxShape.circle,
@@ -268,6 +290,218 @@ class _ScanHint extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Manual Entry Modal ────────────────────────────────────────────────────────
+
+class _ManualEntryModal {
+  static void show(QrScannerController controller) {
+    final textController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final isSubmitting = false.obs;
+
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ManualEntrySheet(
+        textController: textController,
+        formKey: formKey,
+        isSubmitting: isSubmitting,
+        onSubmit: () async {
+          if (!formKey.currentState!.validate()) return;
+          if (isSubmitting.value) return;
+
+          isSubmitting.value = true;
+          Navigator.of(Get.context!).pop(); // close modal
+          await controller.openCheckIn(textController.text.trim());
+          isSubmitting.value = false;
+        },
+      ),
+    );
+  }
+}
+
+class _ManualEntrySheet extends StatelessWidget {
+  final TextEditingController textController;
+  final GlobalKey<FormState> formKey;
+  final RxBool isSubmitting;
+  final VoidCallback onSubmit;
+
+  const _ManualEntrySheet({
+    required this.textController,
+    required this.formKey,
+    required this.isSubmitting,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final sheetBg = dark ? const Color(0xFF1E1E1E) : Colors.white;
+    final labelColor = dark ? Colors.white70 : Colors.black54;
+    final inputBg = dark ? const Color(0xFF2A2A2A) : const Color(0xFFF4F4F4);
+    final textColor = dark ? Colors.white : Colors.black;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: sheetBg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: (dark ? Colors.white : Colors.black).withValues(
+                      alpha: 0.15,
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Title
+              Text(
+                'Enter Employee ID',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: TSizes.fontSizeXl,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Use this when the QR code can't be scanned.",
+                style: TextStyle(
+                  color: labelColor,
+                  fontSize: TSizes.fontSizeSm,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Input field
+              TextFormField(
+                controller: textController,
+                autofocus: true,
+                textCapitalization: TextCapitalization.characters,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => onSubmit(),
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: TSizes.fontSizeMd,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'e.g. EMP-0042',
+                  hintStyle: TextStyle(
+                    color: labelColor,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  filled: true,
+                  fillColor: inputBg,
+                  prefixIcon: const Icon(
+                    Iconsax.user,
+                    color: TColors.primary,
+                    size: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: TColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: TColors.error,
+                      width: 1.5,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: TColors.error,
+                      width: 1.5,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter an employee ID';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Submit button
+              Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: isSubmitting.value ? null : onSubmit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: TColors.primary,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: TColors.primary.withValues(
+                        alpha: 0.5,
+                      ),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: isSubmitting.value
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Look Up Employee',
+                            style: TextStyle(
+                              fontSize: TSizes.fontSizeMd,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

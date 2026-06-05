@@ -8,6 +8,20 @@ import '../../utils/constants/app_constant.dart';
 class ApiService {
   static String get baseUrl => ApiConstants.baseUrl;
 
+  /// Resolves a Laravel image path or URL to a full network URL.
+  /// Handles: null, already-full URLs, and relative /storage/... paths.
+  static String? resolveImageUrl(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+    final baseHost = baseUrl.replaceFirst(RegExp(r'/api/v1/?$'), '');
+    final path = raw.startsWith('/') ? raw : '/$raw';
+    // If the path doesn't start with /storage, and it's just profile_pictures/xxx
+    if (!path.startsWith('/storage/')) {
+        return '$baseHost/storage$path';
+    }
+    return '$baseHost$path';
+  }
+
   // 1. Fetch employee details when QR code is scanned
   Future<ScannedEmployee> fetchEmployee(String qrPayload) async {
     try {
@@ -60,22 +74,25 @@ class ApiService {
   // 4. Fetch all currently clocked-in employees (active shifts)
   Future<List<ClockedInRecord>> fetchActiveClockedIn() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/clock/active'),
-      );
+      final response = await http.get(Uri.parse('$baseUrl/clock/active'));
+
+      print('fetchActiveClockedIn - Status: ${response.statusCode}');
+      print('fetchActiveClockedIn - Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseJson = jsonDecode(response.body);
         final List<dynamic> data = responseJson['data'] ?? [];
+        print('fetchActiveClockedIn - Records count: ${data.length}');
         return data
-            .map((item) =>
-                ClockedInRecord.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) => ClockedInRecord.fromJson(item as Map<String, dynamic>),
+            )
             .toList();
       } else {
-        throw Exception(
-            'Failed to load active clocks: ${response.statusCode}');
+        throw Exception('Failed to load active clocks: ${response.statusCode}');
       }
     } catch (e) {
+      print('fetchActiveClockedIn - Error: $e');
       throw Exception('Network error: $e');
     }
   }
@@ -83,16 +100,13 @@ class ApiService {
   // 5. Fetch clock history (completed shifts)
   Future<List<HistoryRecord>> fetchHistory() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/clock/history'),
-      );
+      final response = await http.get(Uri.parse('$baseUrl/clock/history'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseJson = jsonDecode(response.body);
         final List<dynamic> data = responseJson['data'] ?? [];
         return data
-            .map((item) =>
-                HistoryRecord.fromJson(item as Map<String, dynamic>))
+            .map((item) => HistoryRecord.fromJson(item as Map<String, dynamic>))
             .toList();
       } else {
         throw Exception('Failed to load history: ${response.statusCode}');
@@ -109,7 +123,9 @@ class ApiService {
         Uri.parse('$baseUrl/clock/bulk-out'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'employee_ids': employeeIds.map((id) => int.tryParse(id) ?? 0).toList(),
+          'employee_ids': employeeIds
+              .map((id) => int.tryParse(id) ?? 0)
+              .toList(),
         }),
       );
 
