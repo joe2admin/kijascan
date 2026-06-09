@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/features/clocked_in/controllers/clocked_in_controller.dart';
 import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
+import 'package:kijascan/features/history/controllers/history_controller.dart';
 import 'package:kijascan/core/services/audio_service.dart';
+import 'package:kijascan/utils/popups/custom_snackbar.dart';
 
 class BulkClockOutController extends GetxController {
   final isLoading = true.obs;
@@ -93,22 +95,19 @@ class BulkClockOutController extends GetxController {
       if (Get.isRegistered<ClockedInController>()) {
         Get.find<ClockedInController>().loadClockedIn();
       }
+      if (Get.isRegistered<HistoryController>()) {
+        Get.find<HistoryController>().loadHistory();
+      }
 
       Get.back();
-      Get.snackbar(
-        'Bulk Clock Out Complete',
-        '${selectedIds.length} employee(s) have been checked out.',
-        snackPosition: SnackPosition.TOP,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      CustomSnackbar.showSuccess(
+        title: 'Bulk Clock Out Complete',
+        message: '${selectedIds.length} employee(s) have been checked out.',
       );
     } else {
-      Get.snackbar(
-        'Error',
-        'Failed to clock out employees. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      CustomSnackbar.showError(
+        title: 'Error',
+        message: 'Failed to clock out employees. Please try again.',
       );
     }
   }

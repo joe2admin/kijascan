@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
 /// Ticket-style card: date header, dashed divider with side notches, detail grid.
 class EmployeeTicketCard extends StatelessWidget {
@@ -69,8 +70,8 @@ class EmployeeTicketCard extends StatelessWidget {
                   labelColor: labelColor,
                   valueColor: valueColor,
                   employeeId: employeeId,
-                  department: department,
-                  positionRole: positionRole,
+                  department: THelperFunctions.formatTextToTitleCase(department),
+                  positionRole: THelperFunctions.formatTextToTitleCase(positionRole),
                   checkedInTime: checkedInTime,
                   date: date,
                 ),

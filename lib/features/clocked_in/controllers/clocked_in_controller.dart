@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/core/services/audio_service.dart';
+import 'package:kijascan/features/history/controllers/history_controller.dart';
+import 'package:kijascan/utils/popups/custom_snackbar.dart';
 import '../models/clocked_in_record.dart';
 
 enum ClockedInFilter { all, today }
@@ -72,22 +74,20 @@ class ClockedInController extends GetxController {
       _updateStats();
       _applyFilter();
 
+      if (Get.isRegistered<HistoryController>()) {
+        Get.find<HistoryController>().loadHistory();
+      }
+
       Get.back();
 
-      Get.snackbar(
-        'Checked out',
-        '${record.employeeName} has been checked out.',
-        snackPosition: SnackPosition.TOP,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      CustomSnackbar.showSuccess(
+        title: 'Checked out',
+        message: '${record.employeeName} has been checked out.',
       );
     } else {
-      Get.snackbar(
-        'Error',
-        'Failed to clock out ${record.employeeName}. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      CustomSnackbar.showError(
+        title: 'Error',
+        message: 'Failed to clock out ${record.employeeName}. Please try again.',
       );
     }
 

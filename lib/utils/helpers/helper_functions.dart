@@ -199,4 +199,16 @@ class THelperFunctions {
 
     return age;
   }
+
+  /// Formats raw string (e.g. machine_operator) to Title Case (Machine Operator)
+  static String formatTextToTitleCase(String text) {
+    if (text.isEmpty) return text;
+    // Replace underscores and dashes with spaces
+    final spaced = text.replaceAll('_', ' ').replaceAll('-', ' ');
+    // Title case
+    return spaced.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
 }

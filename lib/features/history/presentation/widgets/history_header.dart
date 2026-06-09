@@ -55,7 +55,7 @@ class HistoryHeader extends StatelessWidget {
             child: Icon(
               Iconsax.setting_2,
               color: dark ? TColors.light : TColors.dark,
-              size: 20,
+              size: 26,
             ),
           ),
         ),

@@ -17,7 +17,7 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
     return Scaffold(
       backgroundColor: dark ? TColors.dark : TColors.light,
       appBar: AppBar(
-        backgroundColor: dark ? TColors.dark : TColors.softGrey,
+        backgroundColor: dark ? TColors.dark : TColors.light,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -42,13 +42,18 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Obx(
-              () => Center(
+              () => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: TColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Text(
                   '${controller.selectedCount}/${controller.employees.length}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: TColors.primary,
-                    fontSize: TSizes.fontSizeMd,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -114,12 +119,12 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: _SelectAllCheckbox(dark: dark),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              child: _SelectAllHeader(dark: dark),
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), // padding bottom for fab
                 itemCount: controller.employees.length,
                 itemBuilder: (context, index) {
                   final employee = controller.employees[index];
@@ -138,111 +143,141 @@ class BulkClockOutScreen extends GetView<BulkClockOutController> {
           ],
         );
       }),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          child: Obx(
-            () {
-              final isButtonDisabled = controller.isProcessing.value || !controller.hasSelection;
-              return SizedBox(
-                height: 56,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: TColors.primary,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: dark
-                        ? const Color(0xFF2C3530)
-                        : const Color(0xFFE5E7EB),
-                    disabledForegroundColor: dark
-                        ? Colors.white24
-                        : Colors.black26,
-                    elevation: 0,
-                    shadowColor: TColors.primary.withValues(alpha: 0.3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: isButtonDisabled
-                      ? null
-                      : controller.submitBulkClockOut,
-                  icon: controller.isProcessing.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        )
-                      : Icon(
-                          Iconsax.logout,
-                          size: 20,
-                          color: isButtonDisabled
-                              ? (dark ? Colors.white24 : Colors.black26)
-                              : Colors.white,
-                        ),
-                  label: Text(
-                    controller.isProcessing.value
-                        ? 'Clocking out…'
-                        : 'Clock Out ${controller.selectedCount > 0 ? '(${controller.selectedCount})' : ''}',
-                    style: const TextStyle(
-                      fontSize: TSizes.fontSizeMd,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Outfit',
-                    ),
-                  ),
-                ),
-              );
-            },
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Obx(() {
+        if (controller.employees.isEmpty) return const SizedBox.shrink();
+        
+        final isButtonDisabled = controller.isProcessing.value || !controller.hasSelection;
+        
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          margin: const EdgeInsets.only(bottom: 16),
+          height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: isButtonDisabled ? [] : [
+              BoxShadow(
+                color: TColors.primary.withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ),
-      ),
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TColors.primary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: dark
+                  ? const Color(0xFF2C3530)
+                  : const Color(0xFFE5E7EB),
+              disabledForegroundColor: dark
+                  ? Colors.white24
+                  : Colors.black26,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            ),
+            onPressed: isButtonDisabled
+                ? null
+                : controller.submitBulkClockOut,
+            icon: controller.isProcessing.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Icon(
+                    Iconsax.logout,
+                    size: 20,
+                    color: isButtonDisabled
+                        ? (dark ? Colors.white24 : Colors.black26)
+                        : Colors.white,
+                  ),
+            label: Text(
+              controller.isProcessing.value
+                  ? 'Clocking out…'
+                  : 'Clock Out ${controller.selectedCount > 0 ? '(${controller.selectedCount})' : ''}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Outfit',
+                letterSpacing: -0.2,
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
 
-class _SelectAllCheckbox extends StatelessWidget {
+class _SelectAllHeader extends StatelessWidget {
   final bool dark;
 
-  const _SelectAllCheckbox({required this.dark});
+  const _SelectAllHeader({required this.dark});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<BulkClockOutController>();
 
-    return Obx(
-      () => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: dark
-              ? const Color.fromARGB(255, 25, 30, 27)
-              : TColors.softGrey,
-          borderRadius: BorderRadius.circular(12),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Select employees',
+          style: TextStyle(
+            color: dark ? Colors.white54 : Colors.black54,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Row(
-          children: [
-            Checkbox(
-              value: controller.selectAll.value,
-              onChanged: (value) {
-                controller.toggleSelectAll(value ?? false);
-              },
-              activeColor: TColors.primary,
+        Obx(
+          () => GestureDetector(
+            onTap: () {
+              controller.toggleSelectAll(!controller.selectAll.value);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  controller.selectAll.value ? 'Deselect All' : 'Select All',
+                  style: const TextStyle(
+                    color: TColors.primary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: controller.selectAll.value ? TColors.primary : (dark ? Colors.white24 : Colors.black26),
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                      color: controller.selectAll.value ? TColors.primary : Colors.transparent,
+                    ),
+                    child: controller.selectAll.value
+                        ? const Icon(Icons.check, size: 14, color: Colors.white)
+                        : null,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Text(
-              controller.selectAll.value ? 'Deselect All' : 'Select All',
-              style: TextStyle(
-                color: dark ? Colors.white : TColors.black,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -262,85 +297,114 @@ class _EmployeeListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isSelected
-            ? TColors.primary.withValues(alpha: 0.08)
-            : dark
-            ? TColors.black
-            : TColors.grey,
-        borderRadius: BorderRadius.circular(12),
-        border: isSelected
-            ? Border.all(color: TColors.primary, width: 1.5)
-            : null,
+            ? TColors.primary.withValues(alpha: 0.1)
+            : (dark ? TColors.darkContainer : Colors.white),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected
+              ? TColors.primary.withValues(alpha: 0.5)
+              : (dark ? Colors.transparent : TColors.grey.withValues(alpha: 0.5)),
+          width: 1.5,
+        ),
+        boxShadow: dark || isSelected
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                )
+              ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(
               children: [
-                Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => onTap(),
-                  activeColor: TColors.primary,
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         employee.employeeName,
                         style: TextStyle(
                           color: dark ? Colors.white : TColors.black,
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              employee.role,
-                              style: TextStyle(
-                                color: dark ? Colors.white54 : Colors.black54,
-                                fontSize: 13,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: TColors.primary.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              employee.timeLabel,
-                              style: const TextStyle(
-                                color: TColors.primary,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        employee.role,
+                        style: TextStyle(
+                          color: dark ? Colors.white54 : Colors.black54,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: TColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Iconsax.clock,
+                        size: 12,
+                        color: TColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        employee.timeLabel,
+                        style: const TextStyle(
+                          color: TColors.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: isSelected ? TColors.primary : (dark ? Colors.white24 : Colors.black26),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                    color: isSelected ? TColors.primary : Colors.transparent,
+                  ),
+                  child: isSelected
+                      ? const Icon(Icons.check, size: 14, color: Colors.white)
+                      : null,
                 ),
               ],
             ),

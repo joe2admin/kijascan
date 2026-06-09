@@ -136,7 +136,6 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
     if (!isScanning.value) return;
 
     isScanning.value = false;
-    await cameraController.stop();
 
     await Get.toNamed(
       AppRoutes.checkIn,

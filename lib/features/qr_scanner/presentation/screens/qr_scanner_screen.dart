@@ -176,7 +176,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
       child: Row(
         children: [
           Expanded(
@@ -187,17 +187,17 @@ class _TopBar extends StatelessWidget {
                   'KijaScan',
                   style: TextStyle(
                     color: TColors.softGrey,
-                    fontSize: TSizes.fontSizeXl,
+                    fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.6,
+                    letterSpacing: -0.8,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   'Employee check-in',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.65),
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

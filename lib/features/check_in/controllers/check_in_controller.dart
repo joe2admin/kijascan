@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/routes/app_routes.dart';
 import 'package:kijascan/core/services/audio_service.dart';
+import 'package:kijascan/features/clocked_in/controllers/clocked_in_controller.dart';
+import 'package:kijascan/features/history/controllers/history_controller.dart';
+import 'package:kijascan/utils/popups/custom_snackbar.dart';
 import '../models/scanned_employee.dart';
 
 class CheckInController extends GetxController {
@@ -55,6 +58,14 @@ class CheckInController extends GetxController {
     if (success) {
       AudioService.playCheckInSound();
       statusMessage.value = 'Clock-in recorded successfully.';
+
+      if (Get.isRegistered<ClockedInController>()) {
+        Get.find<ClockedInController>().loadClockedIn();
+      }
+      if (Get.isRegistered<HistoryController>()) {
+        Get.find<HistoryController>().loadHistory();
+      }
+
       final checkedInAt = _formatTimeNow();
       final name = employee.value!.fullName;
       Get.offNamedUntil(
@@ -69,10 +80,9 @@ class CheckInController extends GetxController {
       );
     } else {
       statusMessage.value = 'Failed to record clock-in. Please try again.';
-      Get.snackbar(
-        'Error',
-        statusMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
+      CustomSnackbar.showError(
+        title: 'Error',
+        message: statusMessage.value,
       );
     }
   }

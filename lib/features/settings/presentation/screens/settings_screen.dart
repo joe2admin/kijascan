@@ -22,10 +22,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
 
-    final backgroundColor = dark ? TColors.dark : TColors.softGrey;
+    final backgroundColor = dark ? TColors.dark : TColors.light;
     final foregroundColor = dark ? TColors.light : TColors.dark;
-    final cardColor = dark ? TColors.black : TColors.white;
     final subtitleColor = dark ? TColors.darkerGrey : Colors.black38;
+
+    BoxDecoration buildCardDecoration() {
+      return BoxDecoration(
+        color: dark ? TColors.darkContainer : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: dark ? Colors.transparent : TColors.grey.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
+        boxShadow: dark 
+            ? [] 
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                )
+              ],
+      );
+    }
 
     Widget buildSectionHeader(String title) {
       return Padding(
@@ -33,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Text(
           title.toUpperCase(),
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.4,
             color: subtitleColor,
@@ -52,11 +71,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ValueChanged<bool>? onChanged,
     }) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: buildCardDecoration(),
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -66,25 +82,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: iconBgColor,
+              color: iconBgColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: iconColor, size: 20),
+            child: Icon(icon, color: iconBgColor, size: 20),
           ),
           title: Text(
             title,
             style: TextStyle(
               color: foregroundColor,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               fontSize: TSizes.fontSizeMd,
+              letterSpacing: -0.2,
             ),
           ),
           subtitle: subtitle != null
               ? Text(
                   subtitle,
                   style: TextStyle(
-                    color: dark ? TColors.grey : TColors.darkerGrey,
-                    fontSize: 12,
+                    color: dark ? Colors.white54 : Colors.black54,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 )
               : null,
@@ -92,9 +110,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: value,
             onChanged: onChanged,
             activeColor: Colors.white,
-            activeTrackColor: dark ? TColors.primary : TColors.accent,
+            activeTrackColor: TColors.primary,
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: dark ? TColors.darkGrey : TColors.dark,
+            inactiveTrackColor: dark ? Colors.white24 : Colors.black26,
           ),
         ),
       );
@@ -109,11 +127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       required VoidCallback onTap,
     }) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: buildCardDecoration(),
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -123,23 +138,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: iconBgColor,
+              color: iconBgColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: iconColor, size: 20),
+            child: Icon(icon, color: iconBgColor, size: 20),
           ),
           title: Text(
             title,
             style: TextStyle(
               color: foregroundColor,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               fontSize: 15,
+              letterSpacing: -0.2,
             ),
           ),
           subtitle: subtitle != null
               ? Text(
                   subtitle,
-                  style: TextStyle(color: subtitleColor, fontSize: 12),
+                  style: TextStyle(
+                    color: dark ? Colors.white54 : Colors.black54, 
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 )
               : null,
           trailing: Icon(Iconsax.arrow_right_3, color: subtitleColor, size: 16),
@@ -152,20 +172,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: backgroundColor,
       
       appBar: AppBar(
-        backgroundColor: dark ? TColors.dark : TColors.light,
+        backgroundColor: backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(Iconsax.arrow_left_2, color: foregroundColor, size: 18),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: dark ? TColors.softGrey : TColors.black,
+            size: 20,
           ),
+          onPressed: () => Get.back(),
         ),
         title: Text(
           'Settings',
@@ -173,9 +189,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: foregroundColor,
             fontSize: TSizes.fontSizeXl,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Outfit',
+            letterSpacing: -0.3,
           ),
         ),
+        centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 32),

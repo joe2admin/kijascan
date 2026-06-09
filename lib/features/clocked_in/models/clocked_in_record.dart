@@ -1,4 +1,5 @@
 import 'package:kijascan/core/services/api_services.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
 class ClockedInRecord {
   final String id;
@@ -25,8 +26,10 @@ class ClockedInRecord {
       id: json['employee_id']?.toString() ?? '',
       employeeName: json['full_name']?.toString() ?? '',
       employeeId: json['employee_id_number']?.toString() ?? '',
-      role: json['position']?.toString() ?? '',
-      department: json['department']?.toString(),
+      role: THelperFunctions.formatTextToTitleCase(json['position']?.toString() ?? ''),
+      department: json['department'] != null 
+          ? THelperFunctions.formatTextToTitleCase(json['department'].toString()) 
+          : null,
       checkedInAt:
           DateTime.tryParse(json['clock_in']?.toString() ?? '') ??
           DateTime.now(),
