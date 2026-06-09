@@ -24,13 +24,13 @@ class HistoryStatsRow extends StatelessWidget {
             child: HistoryStatCard(
               label: 'Today',
               value: '$todayCount',
-              icon: Iconsax.calendar_2,
+              icon: Iconsax.calendar_1,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: HistoryStatCard(
-              label: 'Week',
+              label: 'This week',
               value: '$weekCount',
               icon: Iconsax.timer_1,
             ),

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/features/main_shell/controllers/main_shell_controller.dart';
@@ -126,6 +127,7 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
 
     final barcodes = capture.barcodes;
     if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
+      HapticFeedback.vibrate();
       openCheckIn(barcodes.first.rawValue!);
     }
   }

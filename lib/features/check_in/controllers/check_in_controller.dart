@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/routes/app_routes.dart';
+import 'package:kijascan/core/services/audio_service.dart';
 import '../models/scanned_employee.dart';
 
 class CheckInController extends GetxController {
@@ -25,7 +26,7 @@ class CheckInController extends GetxController {
     try {
       employee.value = await _apiService.fetchEmployee(_qrPayload);
     } catch (e) {
-      statusMessage.value = e.toString();
+      statusMessage.value = e.toString().replaceAll('Exception: ', '');
     } finally {
       isLoadingEmployee.value = false;
     }
@@ -52,6 +53,7 @@ class CheckInController extends GetxController {
 
     isSubmitting.value = false;
     if (success) {
+      AudioService.playCheckInSound();
       statusMessage.value = 'Clock-in recorded successfully.';
       final checkedInAt = _formatTimeNow();
       final name = employee.value!.fullName;

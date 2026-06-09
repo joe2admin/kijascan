@@ -85,7 +85,7 @@ class QrScannerScreen extends GetView<QrScannerController> {
           ),
           // Manual entry FAB — bottom right, above nav bar
           Positioned(
-            bottom: 24,
+            bottom: 100,
             right: 24,
             child: SafeArea(
               top: false,
@@ -341,9 +341,9 @@ class _ManualEntrySheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = dark ? const Color(0xFF1E1E1E) : Colors.white;
+    final sheetBg = dark ? TColors.darkContainer : Colors.white;
     final labelColor = dark ? Colors.white70 : Colors.black54;
-    final inputBg = dark ? const Color(0xFF2A2A2A) : const Color(0xFFF4F4F4);
+    final inputBg = dark ? TColors.dark : const Color(0xFFF4F4F4);
     final textColor = dark ? Colors.white : Colors.black;
 
     return Padding(

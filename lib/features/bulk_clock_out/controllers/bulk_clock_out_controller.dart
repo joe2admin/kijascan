@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
 import 'package:kijascan/features/clocked_in/controllers/clocked_in_controller.dart';
 import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
+import 'package:kijascan/core/services/audio_service.dart';
 
 class BulkClockOutController extends GetxController {
   final isLoading = true.obs;
@@ -87,6 +88,7 @@ class BulkClockOutController extends GetxController {
     isProcessing.value = false;
 
     if (success) {
+      AudioService.playCheckOutSound();
       // Refresh the clocked-in list
       if (Get.isRegistered<ClockedInController>()) {
         Get.find<ClockedInController>().loadClockedIn();

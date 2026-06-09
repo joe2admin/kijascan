@@ -7,6 +7,7 @@ import 'package:kijascan/utils/helpers/helper_functions.dart';
 import 'package:kijascan/utils/widgets/employee_avatar.dart';
 import '../../controllers/check_in_controller.dart';
 import '../../models/scanned_employee.dart';
+import '../widgets/check_in_error_view.dart';
 import '../widgets/employee_ticket_card.dart';
 
 class CheckInScreen extends GetView<CheckInController> {
@@ -68,16 +69,7 @@ class CheckInScreen extends GetView<CheckInController> {
 
           final employee = controller.employee.value;
           if (employee == null) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  'Error: ${controller.statusMessage.value}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.red, fontSize: 16),
-                ),
-              ),
-            );
+            return CheckInErrorView(errorMessage: controller.statusMessage.value);
           }
 
           return Column(
@@ -95,7 +87,7 @@ class CheckInScreen extends GetView<CheckInController> {
                       const SizedBox(height: 28),
                       EmployeeTicketCard(
                         cardColor: dark
-                            ? const Color.fromARGB(255, 25, 30, 27)
+                            ? TColors.darkContainer
                             : TColors.white,
                         backgroundColor: dark ? TColors.dark : TColors.softGrey,
                         labelColor: dark ? TColors.white : TColors.dark,

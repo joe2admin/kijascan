@@ -21,7 +21,7 @@ class ClockedInStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: dark ? TColors.darkerGrey : TColors.white,
+        color: dark ? TColors.darkContainer : TColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

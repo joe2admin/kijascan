@@ -68,11 +68,13 @@ class _HistoryChip extends StatelessWidget {
               : TColors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? TColors.primary
-                : dark
-                ? TColors.darkerGrey
-                : TColors.softGrey,
+            color: dark
+                ? isSelected
+                    ? TColors.accent
+                    : TColors.darkerGrey
+                : isSelected
+                    ? TColors.primary
+                    : TColors.softGrey,
           ),
         ),
         child: Text(

@@ -19,10 +19,22 @@ class TAppTheme {
     outlinedButtonTheme: TOutlinedButtonTheme.lightOutlinedButtonTheme,
     inputDecorationTheme: TTextFieldTheme.lightInputDecorationTheme,
     fontFamily: 'Outfit',
+    cardTheme: CardThemeData(
+      color: TColors.lightContainer,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: EdgeInsets.zero,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: TColors.light,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
   );
 
   static ThemeData darkTheme = ThemeData(
-    // scaffoldBackgroundColor: TColors.dark,
+    scaffoldBackgroundColor: TColors.dark,
     brightness: Brightness.dark,
     textTheme: TTextThemes.darkTextTheme,
     appBarTheme: TAppBarTheme.darkAppBarTheme,
@@ -30,5 +42,17 @@ class TAppTheme {
     outlinedButtonTheme: TOutlinedButtonTheme.darkOutlinedButtonTheme,
     inputDecorationTheme: TTextFieldTheme.darkInputDecorationTheme,
     fontFamily: 'Outfit',
+    cardTheme: CardThemeData(
+      color: TColors.darkContainer,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: EdgeInsets.zero,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: TColors.dark,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
   );
 }

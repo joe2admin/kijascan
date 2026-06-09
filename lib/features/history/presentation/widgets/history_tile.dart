@@ -17,7 +17,7 @@ class HistoryTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: dark ? TColors.darkerGrey : TColors.white,
+        color: dark ? TColors.darkContainer : TColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -28,6 +28,7 @@ class HistoryTile extends StatelessWidget {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           EmployeeAvatar(
             name: record.employeeName,
@@ -41,19 +42,45 @@ class HistoryTile extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  record.employeeName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: dark ? TColors.white : TColors.black,
-                    fontSize: TSizes.fontSizeMd,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        record.employeeName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: dark ? TColors.white : TColors.black,
+                          fontSize: TSizes.fontSizeMd,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: TColors.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'Out',
+                        style: TextStyle(
+                          color: TColors.error,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   '${record.employeeId} - ${record.departmentLabel}',
                   maxLines: 1,
@@ -63,7 +90,7 @@ class HistoryTile extends StatelessWidget {
                     fontSize: TSizes.fontSizeSm,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   'In ${record.checkedInTimeLabel} - Out ${record.checkedOutTimeLabel}',
                   maxLines: 1,
@@ -77,42 +104,14 @@ class HistoryTile extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: TColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.logout_rounded, size: 12, color: TColors.error),
-                    SizedBox(width: 4),
-                    Text(
-                      'Out',
-                      style: TextStyle(
-                        color: TColors.error,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                record.durationLabel,
-                style: TextStyle(
-                  color: dark ? TColors.darkGrey : TColors.darkerGrey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          const SizedBox(width: 12),
+          Text(
+            record.durationLabel,
+            style: TextStyle(
+              color: dark ? TColors.darkGrey : TColors.darkerGrey,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),

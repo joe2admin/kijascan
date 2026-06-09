@@ -20,10 +20,9 @@ class HistoryStatCard extends StatelessWidget {
     final dark = THelperFunctions.isDarkMode(context);
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 78),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: dark ? TColors.darkerGrey : TColors.white,
+        color: dark ? TColors.darkContainer : TColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -33,30 +32,40 @@ class HistoryStatCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Row(
         children: [
-          Icon(icon, color: TColors.primary, size: 22),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              color: dark ? TColors.white : TColors.black,
-              fontSize: TSizes.fontSizeLg,
-              fontWeight: FontWeight.w800,
-              height: 1,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: TColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: TColors.primary, size: 22),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: TColors.darkGrey,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: dark ? TColors.white : TColors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: dark ? TColors.white : TColors.black,
+                    fontSize: TSizes.fontSizeLg,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

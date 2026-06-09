@@ -21,7 +21,7 @@ class ClockedInTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: dark ? TColors.darkerGrey : TColors.white,
+          color: dark ? TColors.darkContainer : TColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -32,6 +32,7 @@ class ClockedInTile extends StatelessWidget {
           ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             EmployeeAvatar(
               name: record.employeeName,
@@ -46,17 +47,45 @@ class ClockedInTile extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    record.employeeName,
-                    style: TextStyle(
-                      color: dark ? TColors.white : TColors.black,
-                      fontSize: TSizes.fontSizeMd,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          record.employeeName,
+                          style: TextStyle(
+                            color: dark ? TColors.white : TColors.black,
+                            fontSize: TSizes.fontSizeMd,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: TColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'In',
+                          style: TextStyle(
+                            color: TColors.accent,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     '${record.employeeId} - ${record.departmentLabel}',
                     style: const TextStyle(
@@ -69,48 +98,14 @@ class ClockedInTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: TColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.login_rounded,
-                        size: 12,
-                        color: TColors.primary,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'In',
-                        style: TextStyle(
-                          color: TColors.accent,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  record.timeLabel,
-                  style: TextStyle(
-                    color: dark ? TColors.darkGrey : TColors.darkerGrey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+            const SizedBox(width: 12),
+            Text(
+              record.timeLabel,
+              style: TextStyle(
+                color: dark ? TColors.darkGrey : TColors.darkerGrey,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:kijascan/utils/constants/colors.dart';
@@ -18,46 +19,60 @@ class ScannerBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
     return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: dark ? TColors.dark : TColors.light,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: dark ? TColors.textPrimary : TColors.darkGrey.withValues(alpha: 0.4),
-            blurRadius: TSizes.fontSizeXl,
+            color: dark 
+                ? Colors.black.withValues(alpha: 0.2) 
+                : TColors.darkGrey.withValues(alpha: 0.2),
+            blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _NavItem(
-              icon: Iconsax.people,
-              label: 'Clocked-In',
-              isActive: selectedIndex == 0,
-              onTap: () => onTabChanged(0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: dark 
+                  ? TColors.dark.withValues(alpha: 0.75) 
+                  : TColors.white.withValues(alpha: 0.85),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _NavItem(
+                    icon: Iconsax.user,
+                    label: 'Clocked-In',
+                    isActive: selectedIndex == 0,
+                    onTap: () => onTabChanged(0),
+                  ),
+                ),
+                Expanded(
+                  child: _NavItem(
+                    icon: Iconsax.scan,
+                    label: 'Scan',
+                    isActive: selectedIndex == 1,
+                    onTap: () => onTabChanged(1),
+                  ),
+                ),
+                Expanded(
+                  child: _NavItem(
+                    icon: Iconsax.repeat,
+                    label: 'History',
+                    isActive: selectedIndex == 2,
+                    onTap: () => onTabChanged(2),
+                  ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: _NavItem(
-              icon: Iconsax.scan,
-              label: 'Scan',
-              isActive: selectedIndex == 1,
-              onTap: () => onTabChanged(1),
-            ),
-          ),
-          Expanded(
-            child: _NavItem(
-              icon: Iconsax.repeat,
-              label: 'History',
-              isActive: selectedIndex == 2,
-              onTap: () => onTabChanged(2),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -79,36 +94,51 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isActive
-        ? TColors.primary
+        ? TColors.white
         : TColors.darkGrey.withValues(alpha: 0.8);
 
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: isActive
-              ? TColors.primary.withValues(alpha: 0.12)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(TSizes.borderRadiusXl),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: TSizes.iconMd),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              ),
+      child: Container(
+        color: Colors.transparent,
+        alignment: Alignment.center,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+          decoration: BoxDecoration(
+            color: isActive ? TColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeInOut,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: color, size: TSizes.iconMd),
+                if (isActive) ...[
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -17,7 +17,7 @@ class ApiService {
     final path = raw.startsWith('/') ? raw : '/$raw';
     // If the path doesn't start with /storage, and it's just profile_pictures/xxx
     if (!path.startsWith('/storage/')) {
-        return '$baseHost/storage$path';
+      return '$baseHost/storage$path';
     }
     return '$baseHost$path';
   }
@@ -33,11 +33,13 @@ class ApiService {
         final Map<String, dynamic> responseJson = jsonDecode(response.body);
         final Map<String, dynamic> employeeData = responseJson['data'] ?? {};
         return ScannedEmployee.fromJson(employeeData);
+      } else if (response.statusCode == 404) {
+        throw Exception('Failed to load employee');
       } else {
         throw Exception('Failed to load employee: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw Exception('Failed to load employee');
     }
   }
 
@@ -76,13 +78,9 @@ class ApiService {
     try {
       final response = await http.get(Uri.parse('$baseUrl/clock/active'));
 
-      print('fetchActiveClockedIn - Status: ${response.statusCode}');
-      print('fetchActiveClockedIn - Body: ${response.body}');
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseJson = jsonDecode(response.body);
         final List<dynamic> data = responseJson['data'] ?? [];
-        print('fetchActiveClockedIn - Records count: ${data.length}');
         return data
             .map(
               (item) => ClockedInRecord.fromJson(item as Map<String, dynamic>),
@@ -92,7 +90,6 @@ class ApiService {
         throw Exception('Failed to load active clocks: ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchActiveClockedIn - Error: $e');
       throw Exception('Network error: $e');
     }
   }

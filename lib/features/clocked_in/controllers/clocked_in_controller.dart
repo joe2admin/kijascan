@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijascan/core/services/api_services.dart';
+import 'package:kijascan/core/services/audio_service.dart';
 import '../models/clocked_in_record.dart';
 
-enum ClockedInFilter { all, today, week }
+enum ClockedInFilter { all, today }
 
 class ClockedInController extends GetxController {
   final isLoading = true.obs;
@@ -11,6 +12,7 @@ class ClockedInController extends GetxController {
   final groups = <ClockedInDayGroup>[].obs;
   final todayCount = 0.obs;
   final weekCount = 0.obs;
+  final totalCount = 0.obs;
   final isCheckingOut = false.obs;
   final errorMessage = ''.obs;
 
@@ -45,6 +47,7 @@ class ClockedInController extends GetxController {
       groups.clear();
       todayCount.value = 0;
       weekCount.value = 0;
+      totalCount.value = 0;
     } finally {
       isLoading.value = false;
     }
@@ -63,6 +66,7 @@ class ClockedInController extends GetxController {
     final success = await _apiService.submitClockOut(record.id);
 
     if (success) {
+      AudioService.playCheckOutSound();
       // Remove from local list and refresh
       _allRecords = _allRecords.where((r) => r.id != record.id).toList();
       _updateStats();
@@ -93,7 +97,6 @@ class ClockedInController extends GetxController {
   void _applyFilter() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final weekStart = today.subtract(Duration(days: today.weekday - 1));
 
     print(
       '_applyFilter - Filter: ${selectedFilter.value}, Total records: ${_allRecords.length}',
@@ -114,8 +117,6 @@ class ClockedInController extends GetxController {
           final match = day == today;
           print('_applyFilter - Today filter, day == today: $match');
           return match;
-        case ClockedInFilter.week:
-          return !day.isBefore(weekStart);
         case ClockedInFilter.all:
           return true;
       }
@@ -179,6 +180,7 @@ class ClockedInController extends GetxController {
 
     todayCount.value = todayTotal;
     weekCount.value = weekTotal;
+    totalCount.value = _allRecords.length;
   }
 
   String _formatDate(DateTime date) {

@@ -16,7 +16,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
+  final bool _notificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       required String title,
       String? subtitle,
       required bool value,
-      required ValueChanged<bool> onChanged,
+      ValueChanged<bool>? onChanged,
     }) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -197,17 +197,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           buildToggleTile(
             icon: Iconsax.notification,
-            iconBgColor: TColors.primary,
-            iconColor: dark ? TColors.white : TColors.softGrey,
+            iconBgColor: dark ? TColors.darkerGrey : TColors.grey,
+            iconColor: dark ? TColors.darkGrey : TColors.darkerGrey,
             title: 'Notifications',
-            subtitle: _notificationsEnabled
-                ? 'Push alerts enabled'
-                : 'All alerts muted',
-            value: _notificationsEnabled,
-            onChanged: (val) {
-              setState(() => _notificationsEnabled = val);
-              // TODO: handle notification permission logic here
-            },
+            subtitle: 'Not available yet',
+            value: false,
+            onChanged: null,
           ),
 
           // ── About ─────────────────────────────────────
@@ -219,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             iconColor: dark ? TColors.white : TColors.softGrey,
             title: 'About KijaScan',
             subtitle: 'Version 1.0.0',
-            onTap: () {},
+            onTap: () => Get.toNamed('/about'),
           ),
         ],
       ),

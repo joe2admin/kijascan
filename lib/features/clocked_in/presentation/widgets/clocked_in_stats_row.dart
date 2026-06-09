@@ -4,12 +4,12 @@ import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_sta
 
 class ClockedInStatsRow extends StatelessWidget {
   final int todayCount;
-  final int weekCount;
+  final int totalCount;
 
   const ClockedInStatsRow({
     super.key,
     required this.todayCount,
-    required this.weekCount,
+    required this.totalCount,
   });
 
   @override
@@ -28,9 +28,9 @@ class ClockedInStatsRow extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: ClockedInStatCard(
-              label: 'This week',
-              value: '$weekCount',
-              icon: Iconsax.timer_1,
+              label: 'Total',
+              value: '$totalCount',
+              icon: Iconsax.add_circle,
             ),
           ),
         ],

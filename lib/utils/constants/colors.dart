@@ -22,12 +22,12 @@ class TColors {
 
   // ── Backgrounds ──────────────────────────────────────
   static const Color light = Color(0xFFF6F6F6);
-  static const Color dark = Color(0xFF272727);
+  static const Color dark = Color(0xFF111D15); // Very dark forest green
   static const Color primaryBackground = Color(0xFFF3F5FF);
 
   // ── Containers ───────────────────────────────────────
   static const Color lightContainer = Color(0xFFF6F6F6);
-  static Color darkContainer = Color(0xFFFFFFFF).withValues(alpha: 0.1);
+  static const Color darkContainer = Color(0xFF19291D); // Deep forest green for cards/containers
 
   // ── Buttons ──────────────────────────────────────────
   // Tip: buttonPrimary == primary — you can just use primary directly
@@ -54,6 +54,6 @@ class TColors {
   static const Color black = Color(0xFF232323);
 
   //CARD COLORS
-  static const Color darkCardbg = Color.fromARGB(0, 41, 55, 46);
-  static const Color lightCardbg = Color.fromARGB(0, 210, 247, 215);
+  static const Color darkCardbg = Color(0xFF19291D);
+  static const Color lightCardbg = Color(0xFFD2F7D7);
 }

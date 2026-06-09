@@ -27,11 +27,12 @@ class MainShellScreen extends GetView<MainShellController> {
             ? SystemUiOverlayStyle.light
             : SystemUiOverlayStyle.dark,
         child: Scaffold(
+          extendBody: true,
           backgroundColor: isScanTab
               ? Colors.transparent
               : dark
-              ? TColors.dark
-              : TColors.light,
+                  ? TColors.dark
+                  : TColors.light,
           body: IndexedStack(
             index: index,
             children: const [

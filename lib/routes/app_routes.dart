@@ -7,4 +7,5 @@ abstract class AppRoutes {
   static const checkInSuccess = '/check_in_success';
   static const bulkClockOut = '/bulk_clock_out';
   static const settings = '/settings';
+  static const about = '/about';
 }

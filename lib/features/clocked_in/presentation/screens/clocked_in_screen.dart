@@ -37,7 +37,7 @@ class ClockedInScreen extends GetView<ClockedInController> {
                 Obx(
                   () => ClockedInStatsRow(
                     todayCount: controller.todayCount.value,
-                    weekCount: controller.weekCount.value,
+                    totalCount: controller.totalCount.value,
                   ),
                 ),
                 const SizedBox(height: TSizes.defaultSpace),
@@ -53,31 +53,37 @@ class ClockedInScreen extends GetView<ClockedInController> {
                 const SizedBox(height: 12),
                 Expanded(
                   child: Obx(() {
+                    Widget content;
                     if (controller.isLoading.value) {
-                      return const Center(
+                      content = const Center(
+                        key: ValueKey('loading'),
                         child: CircularProgressIndicator(
                           color: TColors.primary,
                           strokeWidth: 2.5,
                         ),
                       );
+                    } else if (controller.groups.isEmpty) {
+                      content = const EmptyClockedIn(key: ValueKey('empty'));
+                    } else {
+                      content = RefreshIndicator(
+                        key: const ValueKey('list'),
+                        color: TColors.primary,
+                        onRefresh: controller.loadClockedIn,
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
+                          itemCount: controller.groups.length,
+                          itemBuilder: (context, index) {
+                            final group = controller.groups[index];
+                            return ClockedInDaySection(group: group);
+                          },
+                        ),
+                      );
                     }
-
-                    if (controller.groups.isEmpty) {
-                      return const EmptyClockedIn();
-                    }
-
-                    return RefreshIndicator(
-                      color: TColors.primary,
-                      onRefresh: controller.loadClockedIn,
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                        itemCount: controller.groups.length,
-                        itemBuilder: (context, index) {
-                          final group = controller.groups[index];
-                          return ClockedInDaySection(group: group);
-                        },
-                      ),
+                    
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: content,
                     );
                   }),
                 ),
@@ -85,7 +91,7 @@ class ClockedInScreen extends GetView<ClockedInController> {
             ),
           ),
           Positioned(
-            bottom: 24,
+            bottom: 100,
             right: 24,
             child: Obx(
               () => FloatingActionButton.extended(

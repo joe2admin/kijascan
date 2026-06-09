@@ -98,7 +98,7 @@ class EmployeeAvatar extends StatelessWidget {
           ),
         );
       },
-      errorBuilder: (_, error, __) {
+      errorBuilder: (_, error, _) {
         debugPrint('EmployeeAvatar load error [$imageUrl]: $error');
         return fallback;
       },

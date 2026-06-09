@@ -3,6 +3,7 @@ import 'package:kijascan/features/clocked_in/models/clocked_in_record.dart';
 import 'package:kijascan/features/clocked_in/presentation/widgets/clocked_in_tile.dart';
 import 'package:kijascan/utils/constants/colors.dart';
 import 'package:kijascan/utils/constants/sizes.dart';
+import 'package:kijascan/utils/helpers/helper_functions.dart';
 
 class ClockedInDaySection extends StatelessWidget {
   final ClockedInDayGroup group;
@@ -11,6 +12,8 @@ class ClockedInDaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = THelperFunctions.isDarkMode(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -20,8 +23,8 @@ class ClockedInDaySection extends StatelessWidget {
             children: [
               Text(
                 group.title,
-                style: const TextStyle(
-                  color: TColors.black,
+                style: TextStyle(
+                  color: dark ? TColors.white : TColors.black,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),

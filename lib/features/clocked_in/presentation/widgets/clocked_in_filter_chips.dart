@@ -27,12 +27,6 @@ class ClockedInFilterChips extends StatelessWidget {
           isSelected: selected == ClockedInFilter.today,
           onTap: () => onSelected(ClockedInFilter.today),
         ),
-        const SizedBox(width: 8),
-        ClockedInChip(
-          label: 'This week',
-          isSelected: selected == ClockedInFilter.week,
-          onTap: () => onSelected(ClockedInFilter.week),
-        ),
       ],
     );
   }

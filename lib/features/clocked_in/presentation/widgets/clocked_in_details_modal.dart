@@ -34,7 +34,7 @@ class ClockedInDetailsModal extends GetView<ClockedInController> {
       ),
       margin: const EdgeInsets.only(top: 40),
       decoration: BoxDecoration(
-        color: dark ? TColors.dark : TColors.light,
+        color: dark ? TColors.darkContainer : TColors.light,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -57,7 +57,7 @@ class ClockedInDetailsModal extends GetView<ClockedInController> {
                   ClockedInProfileHeader(record: record),
                   const SizedBox(height: 24),
                   EmployeeTicketCard(
-                    cardColor: dark? TColors.darkerGrey : TColors.white,
+                    cardColor: dark? TColors.dark : TColors.white,
                     backgroundColor: dark ? TColors.dark : TColors.softGrey,
                     labelColor: dark ? TColors.softGrey : TColors.darkGrey,
                     valueColor: dark ? TColors.light : TColors.dark,
