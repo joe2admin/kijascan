@@ -59,7 +59,20 @@ class HistoryScreen extends GetView<HistoryController> {
                     ),
                   );
                 } else if (controller.groups.isEmpty) {
-                  content = const EmptyHistory(key: ValueKey('empty'));
+                  content = RefreshIndicator(
+                    key: const ValueKey('empty'),
+                    color: TColors.primary,
+                    onRefresh: controller.loadHistory,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        const SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: EmptyHistory(),
+                        ),
+                      ],
+                    ),
+                  );
                 } else {
                   content = RefreshIndicator(
                     key: const ValueKey('list'),

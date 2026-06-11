@@ -44,19 +44,35 @@ class ApiService {
   }
 
   // 2. Submit clock-in request
-  Future<bool> submitClockIn(String employeeId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/clock/in'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'employee_id': employeeId}),
-      );
+Future<bool> submitClockIn(String employeeId) async {
+  try {
+    final now = DateTime.now();
 
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      return false;
-    }
+    // Format date as YYYY-MM-DD
+    final attendanceDate =
+        "${now.year.toString().padLeft(4, '0')}-"
+        "${now.month.toString().padLeft(2, '0')}-"
+        "${now.day.toString().padLeft(2, '0')}";
+
+    // Determine shift
+    final hour = now.hour;
+    final shift = (hour >= 7 && hour < 16) ? 'day' : 'night';
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/clock/in'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'employee_id': employeeId,
+        'attendance_date': attendanceDate,
+        'shift': shift,
+      }),
+    );
+
+    return response.statusCode == 200 || response.statusCode == 201;
+  } catch (e) {
+    return false;
   }
+}
 
   // 3. Submit clock-out request for a single employee
   Future<bool> submitClockOut(String employeeId) async {

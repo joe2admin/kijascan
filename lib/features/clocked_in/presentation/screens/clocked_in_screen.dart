@@ -63,7 +63,20 @@ class ClockedInScreen extends GetView<ClockedInController> {
                         ),
                       );
                     } else if (controller.groups.isEmpty) {
-                      content = const EmptyClockedIn(key: ValueKey('empty'));
+                      content = RefreshIndicator(
+                        key: const ValueKey('empty'),
+                        color: TColors.primary,
+                        onRefresh: controller.loadClockedIn,
+                        child: CustomScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: EmptyClockedIn(),
+                            ),
+                          ],
+                        ),
+                      );
                     } else {
                       content = RefreshIndicator(
                         key: const ValueKey('list'),

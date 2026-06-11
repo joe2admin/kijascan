@@ -75,17 +75,21 @@ class QrScannerScreen extends GetView<QrScannerController> {
                   onTorch: controller.toggleTorch,
                   isTorchOn: controller.isTorchOn,
                 ),
-                const Spacer(),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: _ScanHint(),
-                ),
               ],
             ),
           ),
-          // Manual entry FAB — bottom right, above nav bar
+          // Scan hint positioned just above the bottom nav bar
           Positioned(
-            bottom: 100,
+            bottom: 116, // Added a little more space above the bottom nav bar
+            left: 0,
+            right: 0,
+            child: const Center(
+              child: _ScanHint(),
+            ),
+          ),
+          // Manual entry FAB — positioned above the scan hint to avoid overlapping
+          Positioned(
+            bottom: 130, 
             right: 24,
             child: SafeArea(
               top: false,
@@ -237,14 +241,14 @@ class _GlassIconButton extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
-          width: 44,
-          height: 44,
+          width: 52,
+          height: 52,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.14),
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
           ),
-          child: Icon(icon, color: Colors.white, size: 22),
+          child: Icon(icon, color: Colors.white, size: 26),
         ),
       ),
     );

@@ -29,6 +29,7 @@ class CheckInSuccessScreen extends StatelessWidget {
     final employeeName = args['employeeName'] as String? ?? 'Employee';
     final checkedInTime = args['checkedInTime'] as String?;
     final date = args['date'] as String?;
+    final isClockOut = args['isClockOut'] as bool? ?? false;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -46,11 +47,15 @@ class CheckInSuccessScreen extends StatelessWidget {
                   color: _green.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.login_rounded, color: _green, size: 40),
+                child: Icon(
+                  isClockOut ? Icons.logout_rounded : Icons.login_rounded, 
+                  color: _green, 
+                  size: 40
+                ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Clock-In Successful',
+                isClockOut ? 'Clock-Out Successful' : 'Clock-In Successful',
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF0F1A12),
                   fontSize: 26,
@@ -68,19 +73,10 @@ class CheckInSuccessScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              // const SizedBox(height: 8),
-                // Text(
-                //   message,
-                //   textAlign: TextAlign.center,
-                //   style: TextStyle(
-                //     color: isDark ? Colors.white54 : Colors.black45,
-                //     fontSize: 14,
-                //   ),
-                // ),
               if (checkedInTime != null) ...[
                 const SizedBox(height: 20),
                 Text(
-                  'Clocked in at $checkedInTime',
+                  isClockOut ? 'Clocked out at $checkedInTime' : 'Clocked in at $checkedInTime',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isDark ? Colors.white70 : const Color(0xFF374151),

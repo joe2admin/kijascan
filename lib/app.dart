@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kijascan/core/theme_controller.dart';
 import 'package:kijascan/routes/app_pages.dart';
 import 'package:kijascan/utils/theme/theme.dart';
+import 'package:kijascan/core/events/realtime_events_controller.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,6 +12,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize ThemeController
     Get.put(ThemeController());
+    
+    // Initialize RealtimeEventsController
+    Get.put(RealtimeEventsController());
 
     return Obx(() {
       final themeMode = Get.find<ThemeController>().themeMode.value;

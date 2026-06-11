@@ -50,14 +50,18 @@ class CheckInController extends GetxController {
     if (isSubmitting.value || employee.value == null) return;
 
     isSubmitting.value = true;
-    statusMessage.value = 'Recording check-in…';
+    final isClockOut = employee.value!.isCurrentlyCheckedIn;
 
-    final success = await _apiService.submitClockIn(employee.value!.id);
+    statusMessage.value = isClockOut ? 'Recording clock-out…' : 'Recording clock-in…';
+
+    final success = isClockOut
+        ? await _apiService.submitClockOut(employee.value!.id)
+        : await _apiService.submitClockIn(employee.value!.id);
 
     isSubmitting.value = false;
     if (success) {
       AudioService.playCheckInSound();
-      statusMessage.value = 'Clock-in recorded successfully.';
+      statusMessage.value = isClockOut ? 'Clock-out recorded successfully.' : 'Clock-in recorded successfully.';
 
       if (Get.isRegistered<ClockedInController>()) {
         Get.find<ClockedInController>().loadClockedIn();
@@ -66,7 +70,7 @@ class CheckInController extends GetxController {
         Get.find<HistoryController>().loadHistory();
       }
 
-      final checkedInAt = _formatTimeNow();
+      final timeNow = _formatTimeNow();
       final name = employee.value!.fullName;
       Get.offNamedUntil(
         AppRoutes.checkInSuccess,
@@ -74,12 +78,13 @@ class CheckInController extends GetxController {
         arguments: {
           'message': statusMessage.value,
           'employeeName': name,
-          'checkedInTime': checkedInAt,
+          'checkedInTime': timeNow,
           'date': employee.value!.attendanceDate,
+          'isClockOut': isClockOut,
         },
       );
     } else {
-      statusMessage.value = 'Failed to record clock-in. Please try again.';
+      statusMessage.value = isClockOut ? 'Failed to record clock-out. Please try again.' : 'Failed to record clock-in. Please try again.';
       CustomSnackbar.showError(
         title: 'Error',
         message: statusMessage.value,

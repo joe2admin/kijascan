@@ -108,6 +108,7 @@ class CheckInScreen extends GetView<CheckInController> {
                   isSubmitting: controller.isSubmitting.value,
                   onCheckIn: controller.submitCheckIn,
                   isDark: dark,
+                  isClockOut: employee.isCurrentlyCheckedIn,
                 ),
               ),
             ],
@@ -182,11 +183,13 @@ class _CheckInBar extends StatelessWidget {
   final bool isSubmitting;
   final VoidCallback onCheckIn;
   final bool isDark;
+  final bool isClockOut;
 
   const _CheckInBar({
     required this.isSubmitting,
     required this.onCheckIn,
     required this.isDark,
+    this.isClockOut = false,
   });
 
   static const Color _green = TColors.primary;
@@ -194,6 +197,7 @@ class _CheckInBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final barBg = isDark ? TColors.dark : TColors.softGrey;
+    final btnColor = isClockOut ? TColors.error : _green;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
@@ -209,11 +213,11 @@ class _CheckInBar extends StatelessWidget {
             child: Container(
               height: 54,
               decoration: BoxDecoration(
-                color: _green,
+                color: btnColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: _green.withValues(alpha: 0.32),
+                    color: btnColor.withValues(alpha: 0.32),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -229,9 +233,9 @@ class _CheckInBar extends StatelessWidget {
                         color: TColors.softGrey,
                       ),
                     )
-                  : const Text(
-                      'Check In',
-                      style: TextStyle(
+                  : Text(
+                      isClockOut ? 'Clock Out' : 'Clock In',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
